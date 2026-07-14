@@ -131,7 +131,7 @@ function CarsContent() {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar Filters */}
           <aside
-            className={`lg:w-72 flex-shrink-0 transition-all duration-300 ${showFilters || true ? 'block' : 'hidden lg:block'}`}
+            className={`lg:w-72 flex-shrink-0 transition-all duration-300 ${showFilters ? 'block' : 'hidden lg:block'}`}
           >
             <div className="glass rounded-2xl p-6 border border-purple-900/30 space-y-6 sticky top-24">
               <h2 className="text-sm font-semibold text-purple-300 uppercase tracking-widest">Refine Results</h2>
@@ -282,8 +282,8 @@ function CarsContent() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {filtered.map((car) => (
-                  <CarCard key={car.id} car={car} />
+                {filtered.map((car, index) => (
+                  <CarCard key={car.id} car={car} priority={index < 3} />
                 ))}
               </div>
             )}

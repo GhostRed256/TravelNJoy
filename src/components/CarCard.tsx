@@ -9,6 +9,7 @@ import { formatPrice, formatMileage, cn } from '@/lib/utils';
 interface CarCardProps {
   car: Car;
   featured?: boolean;
+  priority?: boolean;
 }
 
 const fuelIcons: Record<string, string> = {
@@ -19,7 +20,7 @@ const fuelIcons: Record<string, string> = {
   cng: '🌿',
 };
 
-export default function CarCard({ car, featured }: CarCardProps) {
+export default function CarCard({ car, featured, priority }: CarCardProps) {
   const mainImage = car.images[0] || '/car-sedan.png';
 
   return (
@@ -57,6 +58,7 @@ export default function CarCard({ car, featured }: CarCardProps) {
             src={mainImage}
             alt={`${car.make} ${car.model}`}
             fill
+            priority={priority}
             className="object-cover group-hover:scale-105 transition-transform duration-500"
             sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
           />
