@@ -15,10 +15,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  eslint: {
-    // Warning: This allows production builds to complete even if ESLint errors exist
-    ignoreDuringBuilds: false,
-  },
 };
 
 export default nextConfig;

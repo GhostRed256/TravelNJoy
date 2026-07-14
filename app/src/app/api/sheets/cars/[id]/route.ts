@@ -16,13 +16,14 @@ async function findCarRow(sheets: ReturnType<typeof getSheetsClient>, id: string
 }
 
 // PUT - Update a car
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const updatedCar: Car = await req.json();
     updatedCar.updatedAt = new Date().toISOString();
 
     const sheets = getSheetsClient();
-    const result = await findCarRow(sheets, params.id);
+    const result = await findCarRow(sheets, id);
 
     if (!result) {
       return NextResponse.json({ error: 'Car not found' }, { status: 404 });
@@ -43,10 +44,11 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 }
 
 // DELETE - Remove a car
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const sheets = getSheetsClient();
-    const result = await findCarRow(sheets, params.id);
+    const result = await findCarRow(sheets, id);
 
     if (!result) {
       return NextResponse.json({ error: 'Car not found' }, { status: 404 });

@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import {
   ArrowLeft, Calendar, Gauge, Fuel, Settings2, Users, Palette,
-  Engine, ChevronLeft, ChevronRight, Share2, MessageCircle,
+  ChevronLeft, ChevronRight, Share2, MessageCircle,
   CheckCircle2, Star, Shield, Phone, X
 } from 'lucide-react';
 import { Car } from '@/types/car';
