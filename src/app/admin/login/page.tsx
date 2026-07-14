@@ -95,8 +95,9 @@ export default function AdminLoginPage() {
           </button>
 
           <div className="mt-6 pt-5 border-t border-purple-900/30 text-center">
-            <p className="text-xs text-gray-600">
-              Default password is set via <code className="text-purple-400 bg-purple-900/20 px-1 py-0.5 rounded">ADMIN_PASSWORD</code> environment variable.
+            <p className="text-xs text-gray-500 flex items-center justify-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 opacity-70" />
+              Restricted Area • Authorized Personnel Only
             </p>
           </div>
         </form>
