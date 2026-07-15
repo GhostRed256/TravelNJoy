@@ -15,6 +15,9 @@ const nextConfig: NextConfig = {
       },
     ],
     formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 828, 1080, 1200],
+    imageSizes: [16, 32, 64, 96, 256, 384],
+    minimumCacheTTL: 604800, // cache optimized images for 7 days
   },
 };
 
