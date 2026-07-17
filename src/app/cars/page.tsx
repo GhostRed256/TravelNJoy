@@ -70,8 +70,9 @@ function CarsContent() {
     if (filters.search) {
       const q = filters.search.toLowerCase();
       const priceStr = car.quotingPrice?.toString() || '';
+      const featuresStr = (car.features || []).join(' ');
       const match =
-        `${car.make} ${car.modelVariant} ${car.yearOfManufacture} ${car.color} ${car.carType}`.toLowerCase().includes(q) ||
+        `${car.make} ${car.modelVariant} ${car.yearOfManufacture} ${car.color} ${car.carType} ${car.fuel} ${car.transmission} ${car.registrationNo || ''} ${featuresStr}`.toLowerCase().includes(q) ||
         priceStr.includes(q);
       if (!match) return false;
     }

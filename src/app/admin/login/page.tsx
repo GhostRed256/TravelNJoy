@@ -1,15 +1,18 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Car, Eye, EyeOff, Lock, ShieldCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-export default function AdminLoginPage() {
+function AdminLoginForm() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  
+  const redirectTo = searchParams.get('redirect') || '/admin';
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +27,7 @@ export default function AdminLoginPage() {
 
       if (res.ok) {
         toast.success('Welcome back, Admin!');
-        router.push('/admin');
+        router.push(redirectTo);
       } else {
         toast.error('Incorrect password. Please try again.');
       }
@@ -103,5 +106,17 @@ export default function AdminLoginPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <AdminLoginForm />
+    </Suspense>
   );
 }

@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/firebase-admin';
 
+import { cookies } from 'next/headers';
+
 export async function GET(req: NextRequest, { params }: { params: Promise<{ carId: string, docType: string }> }) {
   try {
     const { carId, docType } = await params;
+    
+    // Check if the user is authenticated as Admin
+    const cookieStore = await cookies();
+    const session = cookieStore.get('admin_session');
+    if (session?.value !== 'authenticated') {
+      const loginUrl = new URL('/admin/login', req.nextUrl.origin);
+      loginUrl.searchParams.set('redirect', req.nextUrl.pathname);
+      return NextResponse.redirect(loginUrl);
+    }
     
     // Map nice URL names to Firestore document fields
     const docFieldMap: Record<string, string> = {

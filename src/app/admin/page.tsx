@@ -179,9 +179,11 @@ export default function AdminDashboard() {
     setEditingCar(prev => ({ ...prev, features: (prev.features || []).filter((_, idx) => idx !== i) }));
   };
 
-  const filtered = cars.filter(c =>
-    `${c.make} ${c.modelVariant} ${c.yearOfManufacture} ${c.status}`.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = cars.filter(c => {
+    const featuresStr = (c.features || []).join(' ');
+    const searchString = `${c.make} ${c.modelVariant} ${c.yearOfManufacture} ${c.status} ${c.registrationNo || ''} ${c.color} ${c.fuel} ${c.transmission} ${c.rcName || ''} ${c.chassisNo || ''} ${c.engineNo || ''} ${featuresStr}`.toLowerCase();
+    return searchString.includes(search.toLowerCase());
+  });
 
   const stats = {
     total: cars.length,
