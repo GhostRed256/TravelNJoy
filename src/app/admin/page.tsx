@@ -180,9 +180,17 @@ export default function AdminDashboard() {
   };
 
   const filtered = cars.filter(c => {
+    if (!search.trim()) return true;
+    const q = search.toLowerCase();
     const featuresStr = (c.features || []).join(' ');
-    const searchString = `${c.make} ${c.modelVariant} ${c.yearOfManufacture} ${c.status} ${c.registrationNo || ''} ${c.color} ${c.fuel} ${c.transmission} ${c.rcName || ''} ${c.chassisNo || ''} ${c.engineNo || ''} ${featuresStr}`.toLowerCase();
-    return searchString.includes(search.toLowerCase());
+    const priceStr = c.quotingPrice?.toString() || '';
+    const searchString = [
+      c.make, c.modelVariant, c.yearOfManufacture, c.status,
+      c.registrationNo, c.color, c.fuel, c.transmission,
+      c.rcName, c.chassisNo, c.engineNo, c.buyerName,
+      c.description, c.carType, c.engine, featuresStr, priceStr
+    ].filter(Boolean).join(' ').toLowerCase();
+    return searchString.includes(q);
   });
 
   const stats = {
@@ -237,7 +245,7 @@ export default function AdminDashboard() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-400" />
             <input
               type="text"
-              placeholder="Search cars..."
+              placeholder="Search by reg no, make, model, color, buyer..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="input-dark pl-12 h-11"

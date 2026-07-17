@@ -7,7 +7,7 @@ import CarCard from '@/components/CarCard';
 import { Car, CarFilters, FuelType, TransmissionType } from '@/types/car';
 import { DEMO_CARS, formatPrice } from '@/lib/utils';
 
-const MAKES = ['All', 'BMW', 'Honda', 'Hyundai', 'Maruti', 'Maruti Suzuki', 'Tata', 'Toyota'];
+const FALLBACK_MAKES = ['BMW', 'Honda', 'Hyundai', 'Maruti', 'Maruti Suzuki', 'Tata', 'Toyota'];
 const FUEL_TYPES: FuelType[] = ['petrol', 'diesel', 'electric', 'hybrid', 'cng'];
 const TRANSMISSION_TYPES: TransmissionType[] = ['manual', 'automatic', 'cvt'];
 
@@ -36,6 +36,11 @@ function CarsContent() {
     transmission: undefined,
     status: 'available',
   });
+
+  // Dynamically compute makes from actual car data
+  const dynamicMakes = cars.length > 0
+    ? ['All', ...Array.from(new Set(cars.map(c => c.make).filter(Boolean))).sort()]
+    : ['All', ...FALLBACK_MAKES];
 
   useEffect(() => {
     // Silently fetch from API and swap in if available — no loading state
@@ -179,9 +184,9 @@ function CarsContent() {
             )}
           </div>
 
-          {/* Quick brand pills */}
+          {/* Quick brand pills - dynamic from real data */}
           <div className="flex flex-wrap gap-2">
-            {MAKES.map((m) => (
+            {dynamicMakes.map((m) => (
               <button
                 key={m}
                 onClick={() => updateFilter('make', m === 'All' ? '' : m)}
@@ -263,7 +268,7 @@ function CarsContent() {
                     onChange={(e) => updateFilter('make', e.target.value)}
                     className="select-dark"
                   >
-                    {MAKES.map((m) => <option key={m} value={m === 'All' ? '' : m}>{m}</option>)}
+                    {dynamicMakes.map((m) => <option key={m} value={m === 'All' ? '' : m}>{m}</option>)}
                   </select>
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-400 pointer-events-none" />
                 </div>
