@@ -5,34 +5,51 @@ export type TransmissionType = 'manual' | 'automatic' | 'cvt';
 export interface Car {
   id: string;
   make: string;
-  model: string;
-  year: number;
-  price: number;
-  mileage: number;
+  modelVariant: string;
+  registrationNo: string;
+  odometer: number;
+  yearOfManufacture: number;
+  acquisitionDate: string;
+  quotingPrice: number;
+  rcName: string;
+  status: CarStatus;
+  
+  // Documents (Seller)
+  docRC?: string;
+  docInsurance?: string;
+  docPUC?: string;
+  docNOC?: string;
+  docSellerPAN?: string;
+  docSellerAadhar?: string;
+
+  // Website only details
+  images: string[];
+  description: string;
   fuel: FuelType;
   transmission: TransmissionType;
   color: string;
-  description: string;
-  images: string[]; // URLs (Google Drive public links)
-  status: CarStatus;
   features: string[];
   engine: string;
   owners: number;
-  ownerName?: string;
-  ownerAddress?: string; // e.g. from RC
+  ownerAddress?: string;
   condition?: string;
   carType?: string;
-  registrationNo?: string;
   chassisNo?: string;
   engineNo?: string;
-  dateOfProcurement?: string;
-  buyerName?: string;
-  buyerAadhar?: string;
-  buyerPan?: string;
-  buyerAddress?: string;
-  soldDate?: string;
+
+  // System fields
+  sheetRow?: number;
   createdAt: string;
   updatedAt?: string;
+
+  // Buyer Details (Sold sheet only)
+  buyerName?: string;
+  buyerPAN?: string;
+  buyerAadhar?: string;
+  buyerAddress?: string;
+  soldDate?: string;
+  docBuyerPAN?: string;
+  docBuyerAadhar?: string;
 }
 
 export interface ChatMessage {

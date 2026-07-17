@@ -71,7 +71,7 @@ export default function CarCard({ car, featured, priority }: CarCardProps) {
           <Image
             key={previewImages[imgIndex]}
             src={previewImages[imgIndex]}
-            alt={`${car.make} ${car.model}`}
+            alt={`${car.make} ${car.modelVariant}`}
             fill
             priority={priority && imgIndex === 0}
             loading={priority && imgIndex === 0 ? 'eager' : 'lazy'}
@@ -109,12 +109,12 @@ export default function CarCard({ car, featured, priority }: CarCardProps) {
             <div>
               <p className="text-xs text-purple-400 font-medium uppercase tracking-wider mb-0.5">{car.make}</p>
               <h3 className="text-lg font-bold text-white group-hover:text-purple-300 transition-colors">
-                {car.model}
+                {car.modelVariant}
               </h3>
             </div>
             <div className="text-right">
               <p className="text-xs text-gray-500 mb-0.5">Price</p>
-              <p className="text-base font-bold text-white">{formatPrice(car.price)}</p>
+              <p className="text-base font-bold text-white">{formatPrice(car.quotingPrice)}</p>
             </div>
           </div>
 
@@ -122,11 +122,11 @@ export default function CarCard({ car, featured, priority }: CarCardProps) {
           <div className="grid grid-cols-3 gap-2 mb-4">
             <div className="flex flex-col items-center glass rounded-lg px-2 py-2">
               <Calendar className="w-3.5 h-3.5 text-purple-400 mb-1" />
-              <span className="text-xs text-gray-300">{car.year}</span>
+              <span className="text-xs text-gray-300">{car.yearOfManufacture}</span>
             </div>
             <div className="flex flex-col items-center glass rounded-lg px-2 py-2">
               <Gauge className="w-3.5 h-3.5 text-purple-400 mb-1" />
-              <span className="text-xs text-gray-300 truncate w-full text-center">{formatMileage(car.mileage)}</span>
+              <span className="text-xs text-gray-300 truncate w-full text-center">{formatMileage(car.odometer)}</span>
             </div>
             <div className="flex flex-col items-center glass rounded-lg px-2 py-2">
               <Settings2 className="w-3.5 h-3.5 text-purple-400 mb-1" />

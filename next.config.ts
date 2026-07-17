@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
+  // Fix Turbopack workspace root detection when multiple lockfiles exist
+  turbopack: {
+    root: path.join(__dirname),
+  },
   images: {
     remotePatterns: [
       {
@@ -11,6 +16,18 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'lh3.googleusercontent.com',
+        pathname: '/**',
+      },
+      {
+        // Firebase Storage public URLs
+        protocol: 'https',
+        hostname: 'storage.googleapis.com',
+        pathname: '/**',
+      },
+      {
+        // Firebase Storage alternate domain
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
         pathname: '/**',
       },
     ],

@@ -28,11 +28,10 @@ export default function CarDetailPage() {
     const fetchCar = async () => {
       setLoading(true);
       try {
-        const res = await fetch('/api/sheets/cars');
+        const res = await fetch(`/api/cars/${id}`);
         if (res.ok) {
           const data = await res.json();
-          const found = data.cars?.find((c: Car) => c.id === id);
-          if (found) { setCar(found); setLoading(false); return; }
+          if (data.car) { setCar(data.car); setLoading(false); return; }
         }
       } catch { /* fall through */ }
       // Demo fallback
@@ -65,7 +64,7 @@ export default function CarDetailPage() {
   const images = car.images.length > 0 ? car.images : ['/car-sedan.png', '/car-suv.png'];
 
   const specs = [
-    { icon: Calendar, label: 'Year', value: car.year.toString() },
+    { icon: Calendar, label: 'Year', value: car.yearOfManufacture?.toString() || 'Unknown' },
     { icon: Settings2, label: 'Car Type', value: car.carType || 'Unknown' },
     { icon: Palette, label: 'Color', value: car.color },
     { icon: Star, label: 'Condition', value: car.condition || 'Unknown' },
@@ -94,7 +93,7 @@ export default function CarDetailPage() {
           </button>
           <Image
             src={images[imageIndex]}
-            alt={`${car.make} ${car.model}`}
+            alt={`${car.make} ${car.modelVariant}`}
             width={1200}
             height={800}
             className="max-h-[85vh] object-contain rounded-2xl"
@@ -130,7 +129,7 @@ export default function CarDetailPage() {
               <div className="relative h-72 md:h-96">
                 <Image
                   src={images[imageIndex]}
-                  alt={`${car.make} ${car.model}`}
+                  alt={`${car.make} ${car.modelVariant}`}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                   priority
@@ -221,10 +220,10 @@ export default function CarDetailPage() {
               <div className="flex items-start justify-between mb-2">
                 <div>
                   <p className="text-sm text-purple-400 font-medium uppercase tracking-wider">{car.make}</p>
-                  <h1 className="text-2xl font-bold text-white font-[var(--font-outfit)]">{car.model}</h1>
+                  <h1 className="text-2xl font-bold text-white font-[var(--font-outfit)]">{car.modelVariant}</h1>
                 </div>
                 <button
-                  onClick={() => navigator.share?.({ title: `${car.make} ${car.model}`, url: window.location.href }).catch(() => {})}
+                  onClick={() => navigator.share?.({ title: `${car.make} ${car.modelVariant}`, url: window.location.href }).catch(() => {})}
                   className="glass rounded-xl p-2 text-purple-400 hover:text-white transition-colors"
                 >
                   <Share2 className="w-5 h-5" />
@@ -243,16 +242,16 @@ export default function CarDetailPage() {
               </div>
 
               <div className="mb-6">
-                <p className="text-xs text-gray-500 mb-1">Owner Name</p>
-                <p className="text-2xl font-bold text-white font-[var(--font-outfit)]">
-                  {car.ownerName || 'Unknown'}
+                <p className="text-xs text-gray-500 mb-1">Price</p>
+                <p className="text-3xl font-bold text-white font-[var(--font-outfit)]">
+                  {formatPrice(car.quotingPrice)}
                 </p>
               </div>
 
               {/* Quick stats */}
               <div className="grid grid-cols-3 gap-3 mb-6">
                 {[
-                  { label: 'Year', value: car.year },
+                  { label: 'Year', value: car.yearOfManufacture },
                   { label: 'Type', value: car.carType || 'N/A' },
                   { label: 'Condition', value: car.condition || 'N/A' },
                 ].map(({ label, value }) => (

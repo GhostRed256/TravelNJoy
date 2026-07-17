@@ -40,7 +40,7 @@ function CarsContent() {
   useEffect(() => {
     // Silently fetch from API and swap in if available — no loading state
     const controller = new AbortController();
-    fetch('/api/sheets/cars', { signal: controller.signal })
+    fetch('/api/cars?filter=public', { signal: controller.signal })
       .then((res) => res.ok ? res.json() : null)
       .then((data) => {
         if (data?.cars?.length > 0) {
@@ -69,17 +69,17 @@ function CarsContent() {
   const filtered = cars.filter((car) => {
     if (filters.search) {
       const q = filters.search.toLowerCase();
-      const priceStr = car.price.toString();
+      const priceStr = car.quotingPrice?.toString() || '';
       const match =
-        `${car.make} ${car.model} ${car.year} ${car.color} ${car.carType}`.toLowerCase().includes(q) ||
+        `${car.make} ${car.modelVariant} ${car.yearOfManufacture} ${car.color} ${car.carType}`.toLowerCase().includes(q) ||
         priceStr.includes(q);
       if (!match) return false;
     }
     if (filters.make && filters.make !== 'All' && car.make !== filters.make) return false;
-    if (filters.minPrice && car.price < filters.minPrice) return false;
-    if (filters.maxPrice && car.price > filters.maxPrice) return false;
-    if (filters.minYear && car.year < filters.minYear) return false;
-    if (filters.maxYear && car.year > filters.maxYear) return false;
+    if (filters.minPrice && car.quotingPrice < filters.minPrice) return false;
+    if (filters.maxPrice && car.quotingPrice > filters.maxPrice) return false;
+    if (filters.minYear && car.yearOfManufacture < filters.minYear) return false;
+    if (filters.maxYear && car.yearOfManufacture > filters.maxYear) return false;
     if (filters.fuel && car.fuel !== filters.fuel) return false;
     if (filters.transmission && car.transmission !== filters.transmission) return false;
     if (filters.status && filters.status !== 'available' && car.status !== filters.status) return false;
