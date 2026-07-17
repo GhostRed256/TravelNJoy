@@ -128,27 +128,26 @@ function handleUpsert(car) {
   const rowData = carToRowData(car, CONFIG.VERCEL_API_URL);
 
   if (existing) {
-    // Diff check to prevent infinite loops (only write if data actually changed)
-    const currentData = existing.data;
-    let hasChanges = false;
-    for (let i = 1; i < rowData.length - 1; i++) { // Skip ID and Last Updated
-      // Convert current sheet values to string for loose comparison
-      let cellA = (currentData[i] || '').toString().trim();
-      let cellB = (rowData[i] || '').toString().trim();
-      
-      // If it's a hyperlink formula, extract the URL for comparison, or just assume it's changed if the formula changed
-      if (cellB.startsWith('=HYPERLINK')) {
-        // basic check is enough since formula string itself is deterministic
-      }
-      
-      if (cellA !== cellB) {
-        hasChanges = true;
-        break;
-      }
+    // If status is NOT sold, but it's currently in the Sold sheet, move it to Listed
+    if (car.status !== 'sold' && existing.sheet.getName() === CONFIG.TAB_SOLD) {
+      existing.sheet.deleteRow(existing.row);
+      let listedSheet = ss.getSheetByName(CONFIG.TAB_LISTED);
+      if (!listedSheet) listedSheet = ss.insertSheet(CONFIG.TAB_LISTED);
+      ensureHeaders(listedSheet);
+      listedSheet.appendRow(rowData);
+      return listedSheet.getLastRow();
     }
-    
-    // Always write if this was an upsert request from Vercel to force sync, 
-    // but in Google Apps Script `onEdit` we diff. Here we just overwrite.
+
+    // If status IS sold, but it's currently in the Listed sheet, move it to Sold
+    if (car.status === 'sold' && existing.sheet.getName() === CONFIG.TAB_LISTED) {
+      existing.sheet.deleteRow(existing.row);
+      let soldSheet = ss.getSheetByName(CONFIG.TAB_SOLD);
+      if (!soldSheet) soldSheet = ss.insertSheet(CONFIG.TAB_SOLD);
+      ensureHeaders(soldSheet);
+      soldSheet.appendRow(rowData);
+      return soldSheet.getLastRow();
+    }
+
     existing.sheet.getRange(existing.row, 1, 1, rowData.length).setValues([rowData]);
     return existing.row;
   } else {
