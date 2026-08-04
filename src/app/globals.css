@@ -168,7 +168,7 @@
   }
 
   .gradient-bg {
-    background: linear-gradient(135deg, #0A0A0F 0%, #13131F 50%, #1A1A2E 100%);
+    background: linear-gradient(135deg, #F8F7FF 0%, #F0EDFF 50%, #E8E5FF 100%);
   }
 
   .dark .gradient-bg {
@@ -180,9 +180,9 @@
   }
 
   .gradient-hero {
-    background: radial-gradient(ellipse at 70% 50%, rgba(124, 58, 237, 0.15) 0%, transparent 60%),
-                radial-gradient(ellipse at 20% 80%, rgba(109, 40, 217, 0.1) 0%, transparent 50%),
-                linear-gradient(180deg, #0A0A0F 0%, #13131F 100%);
+    background: radial-gradient(ellipse at 70% 50%, rgba(124, 58, 237, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 20% 80%, rgba(109, 40, 217, 0.05) 0%, transparent 50%),
+                linear-gradient(180deg, #F8F7FF 0%, #F0EDFF 100%);
   }
 
   .dark .gradient-hero {
@@ -399,11 +399,11 @@
   z-index: 0;
 }
 
-/* Form inputs — always dark */
+/* Form inputs — theme-aware */
 .input-dark {
-  background: rgba(19, 19, 31, 0.8);
-  border: 1px solid rgba(124, 58, 237, 0.25);
-  color: #F8F8FF;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  color: #0F172A;
   border-radius: 0.75rem;
   padding: 0.75rem 1rem;
   transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s, color 0.2s;
@@ -421,10 +421,6 @@
   color: #94A3B8;
 }
 
-.dark .input-dark::placeholder {
-  color: #94A3B8;
-}
-
 .input-dark:focus {
   border-color: rgba(124, 58, 237, 0.6);
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
@@ -434,11 +430,11 @@
   border-color: rgba(124, 58, 237, 0.4);
 }
 
-/* Select — always dark */
+/* Select — theme-aware */
 .select-dark {
-  background: rgba(19, 19, 31, 0.8);
-  border: 1px solid rgba(124, 58, 237, 0.25);
-  color: #F8F8FF;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  color: #0F172A;
   border-radius: 0.75rem;
   padding: 0.75rem 1rem;
   transition: border-color 0.2s, background-color 0.2s, color 0.2s;
@@ -488,21 +484,22 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .chat-bubble-admin {
-  background: rgba(26, 26, 46, 0.9);
-  border: 1px solid rgba(124, 58, 237, 0.2);
+  background: rgba(240, 237, 255, 0.9);
+  border: 1px solid rgba(124, 58, 237, 0.15);
   border-radius: 18px 18px 18px 4px;
-  color: #E5E5F0;
+  color: #1E293B;
 }
 
 .dark .chat-bubble-admin {
   background: rgba(26, 26, 46, 0.9);
+  border: 1px solid rgba(124, 58, 237, 0.2);
   color: #F8F8FF;
 }
 
-/* Table styles — always dark */
+/* Table styles — theme-aware */
 .table-dark th {
-  background: rgba(124, 58, 237, 0.15);
-  color: #A78BFA;
+  background: rgba(124, 58, 237, 0.08);
+  color: #6D28D9;
   font-weight: 600;
   padding: 1rem;
   text-align: left;
@@ -518,12 +515,13 @@ input[type="range"]::-webkit-slider-thumb {
 
 .table-dark td {
   padding: 0.875rem 1rem;
-  border-bottom: 1px solid rgba(124, 58, 237, 0.1);
-  color: #E5E5F0;
+  border-bottom: 1px solid rgba(124, 58, 237, 0.08);
+  color: #1E293B;
   font-size: 0.9rem;
 }
 
 .dark .table-dark td {
+  border-bottom: 1px solid rgba(124, 58, 237, 0.1);
   color: #E5E5F0;
 }
 

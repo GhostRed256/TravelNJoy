@@ -13,13 +13,22 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<ThemeMode>('auto');
-  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('dark');
+  // Read the already-resolved theme from the inline script to prevent flash
+  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof document !== 'undefined') {
+      const attr = document.documentElement.getAttribute('data-theme-resolved');
+      if (attr === 'light' || attr === 'dark') return attr;
+      return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+    }
+    return 'dark';
+  });
 
-  // Initialize theme from storage upon mounting
+  // Initialize theme from storage upon mounting — without re-applying until user changes it
   useEffect(() => {
     const saved = getStoredTheme();
     if (saved) {
       setThemeState(saved);
+      // Don't re-resolve here — the inline script already applied the correct class
     }
   }, []);
 
