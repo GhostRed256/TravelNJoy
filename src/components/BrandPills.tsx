@@ -40,8 +40,8 @@ export default function BrandPills() {
             >
               <div className="glass rounded-xl sm:rounded-2xl p-2.5 sm:p-4 border border-slate-200 dark:border-purple-900/30 card-hover relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-purple-500/10 dark:hover:shadow-purple-900/20 flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left h-full">
                 <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 min-w-0 w-full sm:w-auto">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl gradient-purple flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-110 transition-transform duration-300 p-1.5">
-                    <BrandLogo make={brand.name} className="w-full h-full text-white" />
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white dark:bg-slate-100 border border-slate-200/80 dark:border-slate-300 flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-110 transition-transform duration-300 p-1.5">
+                    <BrandLogo make={brand.name} className="w-full h-full object-contain" />
                   </div>
                   <div className="min-w-0 w-full">
                     <p className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm group-hover:text-purple-700 dark:group-hover:text-purple-300 transition-colors truncate">
