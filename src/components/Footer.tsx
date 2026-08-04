@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { Phone, Mail, MapPin, ChevronRight, MessageCircle } from 'lucide-react';
-import CarLogoSVG from '@/components/CarLogoSVG';
 
 const phone = process.env.NEXT_PUBLIC_DEALER_PHONE || '919999999999';
 const phoneDisplay = phone.startsWith('91') ? `+${phone.slice(0, 2)} ${phone.slice(2, 7)} ${phone.slice(7)}` : `+${phone}`;
@@ -20,8 +19,8 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center gap-3 mb-4 group">
-              <div className="w-16 h-10 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-                <CarLogoSVG className="w-full h-full" />
+              <div className="relative w-12 h-12 overflow-hidden rounded-xl shadow-[0_0_15px_rgba(34,211,238,0.2)] group-hover:scale-105 transition-transform duration-300">
+                <img src="/images/logo.jpg" alt="TravelNJoy Logo" className="w-full h-full object-cover" />
               </div>
               <div>
                 <span className="text-xl font-bold text-slate-900 dark:text-white font-[var(--font-outfit)] transition-colors">
