@@ -29,6 +29,9 @@ const BRAND_MAP: Array<[RegExp, string]> = [
   [/mercedes|benz/i,       '/logos/mercedes.svg'],
   [/audi/i,                '/logos/audi.svg'],
   [/volvo/i,               '/logos/volvo.svg'],
+  [/isuzu/i,               '/logos/isuzu.svg'],
+  [/fiat/i,                '/logos/fiat.svg'],
+  [/ford/i,                '/logos/ford.svg'],
 ];
 
 function getLogoSrc(make: string): string | null {
