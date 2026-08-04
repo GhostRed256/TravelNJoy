@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Car, MessageCircle, LayoutDashboard, ChevronRight } from 'lucide-react';
 import { useSession, signOut } from "next-auth/react";
 import WheelIcon from '@/components/WheelIcon';
+import CarLogoSVG from '@/components/CarLogoSVG';
 import { cn } from '@/lib/utils';
 import ThemeToggle from '@/components/ThemeToggle';
 
@@ -47,10 +48,9 @@ export default function Navbar() {
       <div className="container-max px-4 sm:px-6">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <WheelIcon className="w-5 h-5 md:w-6 md:h-6 animate-[spin_10s_linear_infinite]" />
-            <div className="relative w-10 h-10 md:w-12 md:h-12 overflow-hidden rounded-xl shadow-[0_0_15px_rgba(34,211,238,0.2)] group-hover:scale-105 transition-transform duration-300">
-              <img src="/images/logo.jpg" alt="TravelNJoy Logo" className="w-full h-full object-cover" />
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-12 h-8 md:w-16 md:h-10 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+              <CarLogoSVG className="w-full h-full" />
             </div>
             <div className="flex flex-col leading-none">
               <span className="text-lg md:text-xl font-bold font-[var(--font-outfit)] text-slate-900 dark:text-white transition-colors">
@@ -60,7 +60,6 @@ export default function Navbar() {
                 Premium Cars
               </span>
             </div>
-            <WheelIcon className="w-5 h-5 md:w-6 md:h-6 animate-[spin_10s_linear_infinite]" style={{ animationDirection: 'reverse' }} />
           </Link>
 
           {/* Desktop Nav */}

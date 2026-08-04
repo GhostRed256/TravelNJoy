@@ -313,25 +313,39 @@ function CarsContent() {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar Filters */}
+          {/* Sidebar Filters - Desktop sticky & Mobile modal drawer */}
           <aside
-            className={`lg:w-72 flex-shrink-0 transition-all duration-300 ${showFilters ? 'block' : 'hidden lg:block'}`}
+            className={`transition-all duration-300 ${
+              showFilters
+                ? 'fixed inset-0 z-50 p-4 bg-black/70 backdrop-blur-md overflow-y-auto lg:relative lg:inset-auto lg:z-auto lg:p-0 lg:bg-transparent lg:overflow-visible lg:w-72 flex-shrink-0'
+                : 'hidden lg:block lg:w-72 flex-shrink-0'
+            }`}
           >
-            <div className="glass rounded-2xl p-6 border border-purple-900/30 space-y-6 sticky top-24">
-              <h2 className="text-sm font-semibold text-purple-300 uppercase tracking-widest">Refine Results</h2>
+            <div className="glass rounded-2xl p-6 border border-purple-500/20 dark:border-purple-900/30 space-y-6 sticky top-24 max-w-lg mx-auto lg:max-w-none">
+              <div className="flex items-center justify-between">
+                <h2 className="text-sm font-bold text-purple-700 dark:text-purple-300 uppercase tracking-widest">Refine Results</h2>
+                <button
+                  type="button"
+                  onClick={() => setShowFilters(false)}
+                  className="lg:hidden text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white p-1"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
 
               {/* Status */}
               <div>
-                <label className="text-xs text-gray-500 font-medium mb-3 block">Availability</label>
+                <label className="text-xs text-slate-500 dark:text-gray-400 font-medium mb-3 block">Availability</label>
                 <div className="flex flex-wrap gap-2">
                   {(['', 'available', 'reserved'] as const).map((s) => (
                     <button
                       key={s}
+                      type="button"
                       onClick={() => updateFilter('status', s || undefined)}
                       className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                         (filters.status === s || (!s && !filters.status))
-                          ? 'gradient-purple text-white'
-                          : 'glass text-gray-400 hover:text-purple-300'
+                          ? 'gradient-purple text-white shadow-sm'
+                          : 'glass text-slate-600 dark:text-gray-400 hover:text-purple-700 dark:hover:text-purple-300'
                       }`}
                     >
                       {s === '' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
@@ -342,7 +356,7 @@ function CarsContent() {
 
               {/* Make */}
               <div>
-                <label className="text-xs text-gray-500 font-medium mb-3 block">Brand</label>
+                <label className="text-xs text-slate-500 dark:text-gray-400 font-medium mb-3 block">Brand</label>
                 <div className="relative">
                   <select
                     value={filters.make}
@@ -357,24 +371,24 @@ function CarsContent() {
 
               {/* Price Range */}
               <div>
-                <label className="text-xs text-gray-500 font-medium mb-1 block">
+                <label className="text-xs text-slate-500 dark:text-gray-400 font-medium mb-1 block">
                   Price Range
                 </label>
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-semibold text-purple-300">{formatPrice(filters.minPrice || 0)}</span>
-                  <span className="text-xs font-semibold text-purple-300">{formatPrice(filters.maxPrice || 10000000)}</span>
+                  <span className="text-xs font-semibold text-purple-700 dark:text-purple-300">{formatPrice(filters.minPrice || 0)}</span>
+                  <span className="text-xs font-semibold text-purple-700 dark:text-purple-300">{formatPrice(filters.maxPrice || 10000000)}</span>
                 </div>
                 <div className="space-y-2">
                   <input
                     type="range" min={0} max={10000000} step={100000}
-                    value={filters.minPrice}
-                    onChange={(e) => updateFilter('minPrice', parseInt(e.target.value))}
+                    value={filters.minPrice || 0}
+                    onChange={(e) => updateFilter('minPrice', parseInt(e.target.value) || 0)}
                     className="w-full accent-purple-500"
                   />
                   <input
                     type="range" min={0} max={10000000} step={100000}
-                    value={filters.maxPrice}
-                    onChange={(e) => updateFilter('maxPrice', parseInt(e.target.value))}
+                    value={filters.maxPrice || 10000000}
+                    onChange={(e) => updateFilter('maxPrice', parseInt(e.target.value) || 10000000)}
                     className="w-full accent-purple-500"
                   />
                 </div>
@@ -382,28 +396,31 @@ function CarsContent() {
 
               {/* Year Range */}
               <div>
-                <label className="text-xs text-gray-500 font-medium mb-3 block">
-                  Year: {filters.minYear} — {filters.maxYear}
+                <label className="text-xs text-slate-500 dark:text-gray-400 font-medium mb-3 block">
+                  Year: {filters.minYear || 2000} — {filters.maxYear || new Date().getFullYear()}
                 </label>
                 <div className="flex gap-2">
-                  <input type="number" value={filters.minYear} min={2000} max={filters.maxYear}
-                    onChange={(e) => updateFilter('minYear', parseInt(e.target.value))}
+                  <input type="number" value={filters.minYear || ''} min={2000} max={filters.maxYear || new Date().getFullYear()}
+                    placeholder="2000"
+                    onChange={(e) => updateFilter('minYear', parseInt(e.target.value) || 2000)}
                     className="input-dark text-sm py-2" />
-                  <input type="number" value={filters.maxYear} min={filters.minYear} max={new Date().getFullYear()}
-                    onChange={(e) => updateFilter('maxYear', parseInt(e.target.value))}
+                  <input type="number" value={filters.maxYear || ''} min={filters.minYear || 2000} max={new Date().getFullYear()}
+                    placeholder={new Date().getFullYear().toString()}
+                    onChange={(e) => updateFilter('maxYear', parseInt(e.target.value) || new Date().getFullYear())}
                     className="input-dark text-sm py-2" />
                 </div>
               </div>
 
               {/* Fuel Type */}
               <div>
-                <label className="text-xs text-gray-500 font-medium mb-3 block">Fuel Type</label>
+                <label className="text-xs text-slate-500 dark:text-gray-400 font-medium mb-3 block">Fuel Type</label>
                 <div className="flex flex-wrap gap-2">
                   {FUEL_TYPES.map((f) => (
                     <button key={f}
+                      type="button"
                       onClick={() => updateFilter('fuel', filters.fuel === f ? undefined : f)}
                       className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all capitalize ${
-                        filters.fuel === f ? 'gradient-purple text-white' : 'glass text-gray-400 hover:text-purple-300'
+                        filters.fuel === f ? 'gradient-purple text-white shadow-sm' : 'glass text-slate-600 dark:text-gray-400 hover:text-purple-700 dark:hover:text-purple-300'
                       }`}
                     >
                       {f}
@@ -414,13 +431,14 @@ function CarsContent() {
 
               {/* Transmission */}
               <div>
-                <label className="text-xs text-gray-500 font-medium mb-3 block">Transmission</label>
+                <label className="text-xs text-slate-500 dark:text-gray-400 font-medium mb-3 block">Transmission</label>
                 <div className="flex flex-wrap gap-2">
                   {TRANSMISSION_TYPES.map((t) => (
                     <button key={t}
+                      type="button"
                       onClick={() => updateFilter('transmission', filters.transmission === t ? undefined : t)}
                       className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all uppercase ${
-                        filters.transmission === t ? 'gradient-purple text-white' : 'glass text-gray-400 hover:text-purple-300'
+                        filters.transmission === t ? 'gradient-purple text-white shadow-sm' : 'glass text-slate-600 dark:text-gray-400 hover:text-purple-700 dark:hover:text-purple-300'
                       }`}
                     >
                       {t}
@@ -431,13 +449,14 @@ function CarsContent() {
 
               {/* Body Type */}
               <div>
-                <label className="text-xs text-gray-500 font-medium mb-3 block">Body Type</label>
+                <label className="text-xs text-slate-500 dark:text-gray-400 font-medium mb-3 block">Body Type</label>
                 <div className="flex flex-wrap gap-2">
                   {BODY_TYPES.map((b) => (
                     <button key={b}
+                      type="button"
                       onClick={() => updateFilter('bodyType', filters.bodyType === b ? undefined : b)}
                       className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all capitalize ${
-                        filters.bodyType === b ? 'gradient-purple text-white' : 'glass text-gray-400 hover:text-purple-300'
+                        filters.bodyType === b ? 'gradient-purple text-white shadow-sm' : 'glass text-slate-600 dark:text-gray-400 hover:text-purple-700 dark:hover:text-purple-300'
                       }`}
                     >
                       {b.replace('_', '/')}
@@ -446,12 +465,21 @@ function CarsContent() {
                 </div>
               </div>
 
-              {/* Clear filters button in sidebar */}
-              {activeFilterCount > 0 && (
-                <button type="button" onClick={clearFilters} className="w-full py-2 text-xs text-red-400 hover:text-red-300 transition-colors glass rounded-xl border border-red-500/20 hover:border-red-400/40">
-                  Clear All Filters
+              {/* Apply & Reset Buttons */}
+              <div className="pt-2 space-y-2">
+                <button
+                  type="button"
+                  onClick={() => setShowFilters(false)}
+                  className="btn-primary w-full py-3 text-xs font-bold shadow-md flex items-center justify-center gap-2"
+                >
+                  Show {filtered.length} {filtered.length === 1 ? 'Car' : 'Cars'}
                 </button>
-              )}
+                {activeFilterCount > 0 && (
+                  <button type="button" onClick={clearFilters} className="w-full py-2 text-xs text-red-500 hover:text-red-600 transition-colors glass rounded-xl border border-red-500/20">
+                    Clear All Filters
+                  </button>
+                )}
+              </div>
             </div>
           </aside>
 
