@@ -44,10 +44,10 @@ function CarsContent() {
     status: 'available',
   });
 
-  // Dynamically compute makes from actual car data
-  const dynamicMakes = cars.length > 0
-    ? ['All', ...Array.from(new Set(cars.map(c => c.make).filter(Boolean))).sort()]
-    : ['All', ...FALLBACK_MAKES];
+  // Dynamically compute makes from actual car data, unifying Maruti & Maruti Suzuki into one category
+  const rawMakes = cars.length > 0 ? cars.map(c => c.make).filter(Boolean) : FALLBACK_MAKES;
+  const normalizedMakes = Array.from(new Set(rawMakes.map(m => /^maruti/i.test(m) ? 'Maruti Suzuki' : m))).sort();
+  const dynamicMakes = ['All', ...normalizedMakes];
 
   useEffect(() => {
     const controller = new AbortController();
@@ -145,7 +145,17 @@ function CarsContent() {
         if (!haystack.includes(q)) return false;
       }
     }
-    if (filters.make && filters.make !== 'All' && car.make !== filters.make) return false;
+    if (filters.make && filters.make !== 'All') {
+      const selectedMake = filters.make.toLowerCase();
+      const carMake = (car.make || '').toLowerCase();
+      const isMarutiCategory = selectedMake.includes('maruti') || selectedMake.includes('suzuki');
+      const isCarMaruti = carMake.includes('maruti') || carMake.includes('suzuki');
+      if (isMarutiCategory) {
+        if (!isCarMaruti) return false;
+      } else if (car.make !== filters.make) {
+        return false;
+      }
+    }
     if (filters.minPrice && car.quotingPrice < filters.minPrice) return false;
     if (filters.maxPrice && car.quotingPrice > filters.maxPrice) return false;
     if (filters.minYear && car.yearOfManufacture < filters.minYear) return false;

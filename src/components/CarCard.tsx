@@ -147,8 +147,8 @@ export default function CarCard({ car, allCars, featured, priority, enable3D = f
         <div className={cn("p-5 flex-1 flex flex-col", enable3D && "preserve-3d")}>
           <div className={cn("flex items-start justify-between gap-2 mb-3", enable3D && "translate-z-20")}>
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5 mb-0.5">
-                <div className="w-4 h-4 rounded bg-white dark:bg-slate-100 p-0.5 border border-slate-200/80 shadow-2xs flex items-center justify-center flex-shrink-0">
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-md bg-white p-1 border border-slate-200 dark:border-slate-300 shadow-xs flex items-center justify-center flex-shrink-0">
                   <BrandLogo make={car.make} className="w-full h-full object-contain" />
                 </div>
                 <span className="text-xs text-purple-700 dark:text-purple-400 font-bold uppercase tracking-wider truncate">{car.make}</span>
@@ -161,7 +161,6 @@ export default function CarCard({ car, allCars, featured, priority, enable3D = f
               </h3>
               {car.bodyType && (
                 <div className="mt-1 flex items-center gap-1 text-[11px] font-medium text-slate-500 dark:text-gray-400 uppercase tracking-wider truncate">
-                  <BrandLogo make={car.make} className="w-3 h-3 flex-shrink-0 text-purple-600 dark:text-purple-400" />
                   <span className="truncate">{car.bodyType.replace('_', '/')}</span>
                 </div>
               )}

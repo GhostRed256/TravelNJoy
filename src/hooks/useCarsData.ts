@@ -184,7 +184,8 @@ export function useBrandStats() {
     const counts: Record<string, number> = {};
     cars.forEach((car) => {
       if (!car.make) return;
-      const key = car.make.trim();
+      let key = car.make.trim();
+      if (/^maruti/i.test(key)) key = 'Maruti Suzuki';
       // Match case-insensitively to brand list
       const matchedBrand = popularBrands.find(b => b.name.toLowerCase() === key.toLowerCase())?.name || key;
       counts[matchedBrand] = (counts[matchedBrand] || 0) + 1;

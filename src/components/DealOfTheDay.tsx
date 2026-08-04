@@ -63,7 +63,7 @@ export default function DealOfTheDay() {
 
                 {/* Make & Title */}
                 <div className="flex items-center gap-2 mb-1">
-                  <div className="w-5 h-5 rounded-md bg-white p-0.5 border border-slate-200/80 shadow-sm flex items-center justify-center flex-shrink-0">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-white p-1 border border-slate-200/80 shadow-sm flex items-center justify-center flex-shrink-0">
                     <BrandLogo make={dealCar.make} className="w-full h-full object-contain" />
                   </div>
                   <p className="text-sm font-bold uppercase tracking-widest text-purple-700 dark:text-purple-400">
