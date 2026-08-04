@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Car, MessageCircle, LayoutDashboard, Menu, X, ChevronRight } from 'lucide-react';
+import { MessageCircle, LayoutDashboard, ChevronRight } from 'lucide-react';
 import { useSession, signOut } from "next-auth/react";
+import WheelIcon from '@/components/WheelIcon';
 import { cn } from '@/lib/utils';
 import ThemeToggle from '@/components/ThemeToggle';
 
@@ -46,7 +47,8 @@ export default function Navbar() {
       <div className="container-max px-4 sm:px-6">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
+          <Link href="/" className="flex items-center gap-2 group">
+            <WheelIcon className="w-5 h-5 md:w-6 md:h-6 text-purple-600 dark:text-purple-400 group-hover:rotate-45 transition-transform duration-500" />
             <div className="relative w-10 h-10 md:w-12 md:h-12 overflow-hidden rounded-xl shadow-[0_0_15px_rgba(34,211,238,0.2)] group-hover:scale-105 transition-transform duration-300">
               <img src="/images/logo.jpg" alt="TravelNJoy Logo" className="w-full h-full object-cover" />
             </div>
@@ -58,6 +60,7 @@ export default function Navbar() {
                 Premium Cars
               </span>
             </div>
+            <WheelIcon className="w-5 h-5 md:w-6 md:h-6 text-purple-600 dark:text-purple-400 group-hover:-rotate-45 transition-transform duration-500" />
           </Link>
 
           {/* Desktop Nav */}
@@ -139,7 +142,7 @@ export default function Navbar() {
                   : 'text-slate-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-300'
               )}
             >
-              {Icon ? <Icon className="w-5 h-5" /> : <Car className="w-5 h-5" />}
+              {Icon ? <Icon className="w-5 h-5" /> : <WheelIcon className="w-5 h-5" />}
               <span className="text-[10px] font-medium">{label}</span>
             </Link>
           ))}

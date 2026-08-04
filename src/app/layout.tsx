@@ -52,6 +52,7 @@ export const metadata: Metadata = {
 };
 
 import Providers from "@/components/Providers";
+import NetworkIndicator from "@/components/NetworkIndicator";
 
 export default function RootLayout({
   children,
@@ -102,6 +103,7 @@ export default function RootLayout({
             <main className="relative z-10">{children}</main>
             <Footer />
           </div>
+          <NetworkIndicator />
         </Providers>
 
         <Toaster

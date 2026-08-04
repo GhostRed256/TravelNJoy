@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Award, ChevronRight, Car } from 'lucide-react';
+import { Award, ChevronRight } from 'lucide-react';
+import BrandLogo from '@/components/BrandLogo';
 import { useBrandStats } from '@/hooks/useCarsData';
 
 export default function BrandPills() {
@@ -39,8 +40,8 @@ export default function BrandPills() {
             >
               <div className="glass rounded-2xl p-4 border border-slate-200 dark:border-purple-900/30 card-hover relative overflow-hidden transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-purple-500/10 dark:hover:shadow-purple-900/20 flex items-center justify-between">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-xl gradient-purple flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-110 transition-transform duration-300">
-                    <Car className="w-5 h-5 text-white" />
+                  <div className="w-10 h-10 rounded-xl gradient-purple flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-110 transition-transform duration-300 p-1.5">
+                    <BrandLogo make={brand.name} className="w-full h-full text-white" />
                   </div>
                   <div className="min-w-0">
                     <p className="font-bold text-slate-900 dark:text-white text-sm group-hover:text-purple-700 dark:group-hover:text-purple-300 transition-colors truncate">
