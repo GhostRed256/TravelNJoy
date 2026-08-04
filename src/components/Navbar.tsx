@@ -48,7 +48,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <WheelIcon className="w-5 h-5 md:w-6 md:h-6 text-purple-600 dark:text-purple-400 group-hover:rotate-45 transition-transform duration-500" />
+            <WheelIcon className="w-5 h-5 md:w-6 md:h-6 animate-[spin_10s_linear_infinite]" />
             <div className="relative w-10 h-10 md:w-12 md:h-12 overflow-hidden rounded-xl shadow-[0_0_15px_rgba(34,211,238,0.2)] group-hover:scale-105 transition-transform duration-300">
               <img src="/images/logo.jpg" alt="TravelNJoy Logo" className="w-full h-full object-cover" />
             </div>
@@ -60,7 +60,7 @@ export default function Navbar() {
                 Premium Cars
               </span>
             </div>
-            <WheelIcon className="w-5 h-5 md:w-6 md:h-6 text-purple-600 dark:text-purple-400 group-hover:-rotate-45 transition-transform duration-500" />
+            <WheelIcon className="w-5 h-5 md:w-6 md:h-6 animate-[spin_10s_linear_infinite]" style={{ animationDirection: 'reverse' }} />
           </Link>
 
           {/* Desktop Nav */}
