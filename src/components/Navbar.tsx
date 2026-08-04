@@ -3,15 +3,15 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MessageCircle, LayoutDashboard, ChevronRight } from 'lucide-react';
+import { Car, MessageCircle, LayoutDashboard, ChevronRight } from 'lucide-react';
 import { useSession, signOut } from "next-auth/react";
 import WheelIcon from '@/components/WheelIcon';
 import { cn } from '@/lib/utils';
 import ThemeToggle from '@/components/ThemeToggle';
 
 const navLinks = [
-  { href: '/', label: 'Home' },
-  { href: '/cars', label: 'Browse Cars' },
+  { href: '/', label: 'Home', icon: WheelIcon },
+  { href: '/cars', label: 'Browse Cars', icon: Car },
   { href: '/chat', label: 'Chat', icon: MessageCircle },
 ];
 
