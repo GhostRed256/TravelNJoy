@@ -176,7 +176,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right - 3D Hero Banner Stage with layered perspective */}
+            {/* Right - 3D Hero Banner Stage */}
             <div className="relative hidden lg:flex items-center justify-center perspective-1000">
               <div
                 style={heroTilt.style}
@@ -184,10 +184,8 @@ export default function HomePage() {
                 onMouseLeave={heroTilt.onMouseLeave}
                 className="relative w-full max-w-lg preserve-3d"
               >
-                {/* Specular Ambient Glow */}
                 <div className="hidden md:block absolute -inset-16 rounded-full bg-gradient-to-r from-purple-600/20 via-cyan-500/15 to-purple-800/20 blur-3xl pointer-events-none animate-neon-orb" />
 
-                {/* Main Hero Image Container */}
                 <div className="relative rounded-3xl overflow-hidden glass-3d-panel border border-purple-400/30 dark:border-purple-500/40 p-2.5 translate-z-10 animate-float-3d">
                   <Image
                     src="/hero-banner.png"
@@ -199,7 +197,6 @@ export default function HomePage() {
                   />
                 </div>
 
-                {/* Floating 3D Stat Badge 1: 4.8★ 1200+ Reviews */}
                 <div
                   className="absolute -left-10 top-8 glass-3d-panel rounded-2xl p-4 shadow-2xl translate-z-40 animate-float-3d transition-transform duration-300 hover:translate-z-40"
                   style={{ animationDelay: '0.5s' }}
@@ -215,7 +212,6 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Floating 3D Stat Badge 2: 150-Point Certified Check */}
                 <div
                   className="absolute -right-8 bottom-12 glass-3d-panel rounded-2xl p-4 shadow-2xl translate-z-30 animate-float-3d transition-transform duration-300 hover:translate-z-40"
                   style={{ animationDelay: '2.5s' }}
@@ -231,7 +227,6 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Floating 3D Stat Badge 3: Instant Booking */}
                 <div
                   className="absolute -right-12 top-24 glass-3d-panel rounded-2xl p-3.5 shadow-2xl translate-z-20 animate-float-3d transition-transform duration-300 hover:translate-z-40"
                   style={{ animationDelay: '4.5s' }}
@@ -260,76 +255,35 @@ export default function HomePage() {
       </section>
 
       {/* ─── STATS SECTION ─── */}
-      <section className="py-16 relative">
+      <section className="py-12 md:py-16 relative">
         <div className="container-max px-4 sm:px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             {stats.map(({ icon: Icon, label, value, suffix, divisor }) => (
-              <div key={label} className="glass rounded-2xl p-6 text-center card-hover border border-slate-200 dark:border-purple-900/30 shadow-sm transition-colors duration-300">
-                <div className="w-12 h-12 gradient-purple rounded-xl flex items-center justify-center mx-auto mb-3 glow-sm shadow-md">
-                  <Icon className="w-6 h-6 text-white" />
+              <div key={label} className="glass rounded-2xl p-4 sm:p-6 text-center card-hover border border-slate-200 dark:border-purple-900/30 shadow-sm transition-colors duration-300">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 gradient-purple rounded-xl flex items-center justify-center mx-auto mb-2 sm:mb-3 glow-sm shadow-md">
+                  <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
-                <p className="text-3xl font-bold gradient-text font-[var(--font-outfit)] mb-1">
+                <p className="text-2xl sm:text-3xl font-bold gradient-text font-[var(--font-outfit)] mb-1">
                   <Counter end={value} suffix={suffix} divisor={divisor} />
                 </p>
-                <p className="text-sm text-slate-600 dark:text-gray-400 font-medium">{label}</p>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-gray-400 font-medium">{label}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ─── BRAND PILLS SHOWCASE ─── */}
-      <BrandPills />
-
-      {/* ─── CATEGORY SHOWCASE ─── */}
-      <CategoryShowcase />
-
-      {/* ─── DEAL OF THE DAY BANNER ─── */}
-      <DealOfTheDay />
-
-      {/* ─── FEATURED CARS ─── */}
-      <section className="section-padding">
-        <div className="container-max px-4 sm:px-6">
-          <div className="flex items-end justify-between mb-10">
-            <div>
-              <p className="text-sm text-purple-700 dark:text-purple-400 font-semibold uppercase tracking-widest mb-2 transition-colors">Hand-picked</p>
-              <h2 className="text-3xl md:text-4xl font-bold font-[var(--font-outfit)] text-slate-900 dark:text-white transition-colors">
-                Featured <span className="gradient-text">Cars</span>
-              </h2>
-            </div>
-            <Link href="/cars" className="flex items-center gap-2 text-purple-700 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300 font-semibold text-sm transition-colors group">
-              View All
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredLoading ? (
-              <>
-                <CarSkeleton />
-                <CarSkeleton />
-                <CarSkeleton />
-              </>
-            ) : (
-              featuredCars.map((car) => (
-                <CarCard key={car.id} car={car} featured />
-              ))
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── RECOMMENDED FOR YOU (BEHAVIOR TRACKED) ─── */}
+      {/* ─── 1. RECOMMENDED FOR YOU (PLACED AT TOP AFTER STATS) ─── */}
       {(recLoading || recommendedCars.length > 0) && (
-        <section className="pb-16 pt-4">
+        <section className="py-8 md:py-12 relative">
           <div className="container-max px-4 sm:px-6">
-            <div className="flex items-end justify-between mb-8">
+            <div className="flex items-end justify-between mb-6">
               <div>
-                <p className="text-sm text-purple-700 dark:text-purple-400 font-semibold uppercase tracking-widest mb-1 flex items-center gap-1.5 transition-colors">
-                  <Zap className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                <p className="text-xs sm:text-sm text-purple-700 dark:text-purple-400 font-semibold uppercase tracking-widest mb-1 flex items-center gap-1.5 transition-colors">
+                  <Zap className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
                   {recommendationReason || 'Personalized Pick'}
                 </p>
-                <h2 className="text-2xl md:text-3xl font-bold font-[var(--font-outfit)] text-slate-900 dark:text-white transition-colors">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold font-[var(--font-outfit)] text-slate-900 dark:text-white transition-colors">
                   Recommended <span className="gradient-text">For You</span>
                 </h2>
               </div>
@@ -337,7 +291,7 @@ export default function HomePage() {
                 Explore More →
               </Link>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {recLoading ? (
                 <>
                   <CarSkeleton />
@@ -346,7 +300,7 @@ export default function HomePage() {
                 </>
               ) : (
                 recommendedCars.map((car) => (
-                  <CarCard key={`rec-${car.id}`} car={car} />
+                  <CarCard key={`rec-${car.id}`} car={car} enable3D />
                 ))
               )}
             </div>
@@ -354,28 +308,69 @@ export default function HomePage() {
         </section>
       )}
 
+      {/* ─── 2. BROWSE BY CATEGORY ─── */}
+      <CategoryShowcase />
+
+      {/* ─── 3. POPULAR BRANDS (COMPACT & MOBILE-OPTIMIZED) ─── */}
+      <BrandPills />
+
+      {/* ─── 4. DEAL OF THE DAY BANNER ─── */}
+      <DealOfTheDay />
+
+      {/* ─── 5. FEATURED CARS ─── */}
+      <section className="section-padding">
+        <div className="container-max px-4 sm:px-6">
+          <div className="flex items-end justify-between mb-8 sm:mb-10">
+            <div>
+              <p className="text-xs sm:text-sm text-purple-700 dark:text-purple-400 font-semibold uppercase tracking-widest mb-1.5 transition-colors">Hand-picked</p>
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold font-[var(--font-outfit)] text-slate-900 dark:text-white transition-colors">
+                Featured <span className="gradient-text">Cars</span>
+              </h2>
+            </div>
+            <Link href="/cars" className="flex items-center gap-1.5 text-purple-700 dark:text-purple-400 hover:text-purple-900 dark:hover:text-purple-300 font-semibold text-xs sm:text-sm transition-colors group">
+              View All
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {featuredLoading ? (
+              <>
+                <CarSkeleton />
+                <CarSkeleton />
+                <CarSkeleton />
+              </>
+            ) : (
+              featuredCars.map((car) => (
+                <CarCard key={car.id} car={car} featured enable3D />
+              ))
+            )}
+          </div>
+        </div>
+      </section>
+
       {/* ─── WHY TRAVELNJ0Y ─── */}
       <section className="section-padding relative">
         <div className="absolute inset-0 bg-gradient-to-b from-purple-100/30 dark:from-purple-950/5 via-transparent to-transparent pointer-events-none" />
         <div className="container-max px-4 sm:px-6 relative z-10">
-          <div className="text-center mb-14">
-            <p className="text-sm text-purple-700 dark:text-purple-400 font-semibold uppercase tracking-widest mb-3 transition-colors">Why Choose Us</p>
-            <h2 className="text-3xl md:text-4xl font-bold font-[var(--font-outfit)] text-slate-900 dark:text-white mb-4 transition-colors">
+          <div className="text-center mb-10 sm:mb-14">
+            <p className="text-xs sm:text-sm text-purple-700 dark:text-purple-400 font-semibold uppercase tracking-widest mb-2 transition-colors">Why Choose Us</p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold font-[var(--font-outfit)] text-slate-900 dark:text-white mb-3 transition-colors">
               The Travel<span className="text-cyan-600 dark:text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]">N</span>Joy Difference
             </h2>
-            <p className="text-slate-600 dark:text-gray-400 max-w-xl mx-auto transition-colors">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-gray-400 max-w-xl mx-auto transition-colors">
               We have reimagined the used car buying experience from the ground up — making it simpler, safer, and more enjoyable.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {features.map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="glass rounded-2xl p-6 card-hover border border-slate-200 dark:border-purple-900/30 shadow-sm group transition-colors duration-300">
-                <div className="w-14 h-14 gradient-purple rounded-2xl flex items-center justify-center mb-5 glow-sm group-hover:scale-110 transition-transform duration-300 shadow-md">
-                  <Icon className="w-7 h-7 text-white" />
+              <div key={title} className="glass rounded-2xl p-5 sm:p-6 card-hover border border-slate-200 dark:border-purple-900/30 shadow-sm group transition-colors duration-300">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 gradient-purple rounded-2xl flex items-center justify-center mb-4 sm:mb-5 glow-sm group-hover:scale-110 transition-transform duration-300 shadow-md">
+                  <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                 </div>
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-3 transition-colors">{title}</h3>
-                <p className="text-sm text-slate-600 dark:text-gray-400 leading-relaxed transition-colors">{desc}</p>
+                <h3 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white mb-2 sm:mb-3 transition-colors">{title}</h3>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-gray-400 leading-relaxed transition-colors">{desc}</p>
               </div>
             ))}
           </div>
@@ -385,15 +380,14 @@ export default function HomePage() {
       {/* ─── HOW IT WORKS ─── */}
       <section className="section-padding">
         <div className="container-max px-4 sm:px-6">
-          <div className="text-center mb-14">
-            <p className="text-sm text-purple-700 dark:text-purple-400 font-semibold uppercase tracking-widest mb-3 transition-colors">Simple Process</p>
-            <h2 className="text-3xl md:text-4xl font-bold font-[var(--font-outfit)] text-slate-900 dark:text-white transition-colors">
+          <div className="text-center mb-10 sm:mb-14">
+            <p className="text-xs sm:text-sm text-purple-700 dark:text-purple-400 font-semibold uppercase tracking-widest mb-2 transition-colors">Simple Process</p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold font-[var(--font-outfit)] text-slate-900 dark:text-white transition-colors">
               How It <span className="gradient-text">Works</span>
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-            {/* Connector line */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 relative">
             <div className="hidden md:block absolute top-8 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-purple-300 dark:via-purple-500/40 to-transparent" />
 
             {[
@@ -417,16 +411,16 @@ export default function HomePage() {
               },
             ].map(({ step, icon: Icon, title, desc }) => (
               <div key={step} className="relative flex flex-col items-center text-center group">
-                <div className="relative mb-6">
-                  <div className="w-16 h-16 glass rounded-2xl border border-purple-300 dark:border-purple-500/30 flex items-center justify-center group-hover:border-purple-500 dark:group-hover:border-purple-400/60 transition-colors shadow-sm">
-                    <Icon className="w-8 h-8 text-purple-700 dark:text-purple-400 group-hover:text-purple-900 dark:group-hover:text-purple-300 transition-colors" />
+                <div className="relative mb-4 sm:mb-6">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 glass rounded-2xl border border-purple-300 dark:border-purple-500/30 flex items-center justify-center group-hover:border-purple-500 dark:group-hover:border-purple-400/60 transition-colors shadow-sm">
+                    <Icon className="w-7 h-7 sm:w-8 sm:h-8 text-purple-700 dark:text-purple-400 group-hover:text-purple-900 dark:group-hover:text-purple-300 transition-colors" />
                   </div>
-                  <div className="absolute -top-2 -right-2 w-7 h-7 gradient-purple rounded-full flex items-center justify-center text-xs font-bold text-white shadow-md">
+                  <div className="absolute -top-2 -right-2 w-6 h-6 sm:w-7 sm:h-7 gradient-purple rounded-full flex items-center justify-center text-[10px] sm:text-xs font-bold text-white shadow-md">
                     {step}
                   </div>
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 font-[var(--font-outfit)] transition-colors">{title}</h3>
-                <p className="text-sm text-slate-600 dark:text-gray-400 leading-relaxed max-w-xs transition-colors">{desc}</p>
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-2 font-[var(--font-outfit)] transition-colors">{title}</h3>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-gray-400 leading-relaxed max-w-xs transition-colors">{desc}</p>
               </div>
             ))}
           </div>
@@ -437,29 +431,29 @@ export default function HomePage() {
       <section className="section-padding relative">
         <div className="absolute inset-0 bg-gradient-to-b from-purple-100/20 dark:from-purple-950/5 via-transparent to-purple-100/20 dark:to-purple-950/5 pointer-events-none" />
         <div className="container-max px-4 sm:px-6 relative z-10">
-          <div className="text-center mb-14">
-            <p className="text-sm text-purple-700 dark:text-purple-400 font-semibold uppercase tracking-widest mb-3 transition-colors">Testimonials</p>
-            <h2 className="text-3xl md:text-4xl font-bold font-[var(--font-outfit)] text-slate-900 dark:text-white transition-colors">
+          <div className="text-center mb-10 sm:mb-14">
+            <p className="text-xs sm:text-sm text-purple-700 dark:text-purple-400 font-semibold uppercase tracking-widest mb-2 transition-colors">Testimonials</p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold font-[var(--font-outfit)] text-slate-900 dark:text-white transition-colors">
               Happy <span className="gradient-text">Customers</span>
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
             {testimonials.map(({ name, role, text, rating, avatar }) => (
-              <div key={name} className="glass rounded-2xl p-6 border border-slate-200 dark:border-purple-900/30 card-hover shadow-sm transition-colors duration-300">
-                <div className="flex items-center gap-1 mb-4">
+              <div key={name} className="glass rounded-2xl p-5 sm:p-6 border border-slate-200 dark:border-purple-900/30 card-hover shadow-sm transition-colors duration-300">
+                <div className="flex items-center gap-1 mb-3 sm:mb-4">
                   {Array.from({ length: rating }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 text-amber-400 fill-current" />
+                    <Star key={i} className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 fill-current" />
                   ))}
                 </div>
-                <p className="text-slate-700 dark:text-gray-300 text-sm leading-relaxed mb-6 italic transition-colors">"{text}"</p>
+                <p className="text-slate-700 dark:text-gray-300 text-xs sm:text-sm leading-relaxed mb-4 sm:mb-6 italic transition-colors">"{text}"</p>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 glass rounded-full flex items-center justify-center text-xl shadow-inner">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 glass rounded-full flex items-center justify-center text-lg sm:text-xl shadow-inner">
                     {avatar}
                   </div>
                   <div>
-                    <p className="font-semibold text-slate-900 dark:text-white text-sm transition-colors">{name}</p>
-                    <p className="text-xs text-purple-700 dark:text-purple-400 font-medium transition-colors">{role}</p>
+                    <p className="font-semibold text-slate-900 dark:text-white text-xs sm:text-sm transition-colors">{name}</p>
+                    <p className="text-[10px] sm:text-xs text-purple-700 dark:text-purple-400 font-medium transition-colors">{role}</p>
                   </div>
                 </div>
               </div>
@@ -475,32 +469,31 @@ export default function HomePage() {
             <div className="absolute inset-0 gradient-purple opacity-90" />
             <div className="absolute inset-0 bg-[url('/hero-banner.png')] bg-cover bg-center opacity-10" />
 
-            {/* Decorative blobs */}
             <div className="hidden md:block absolute top-0 right-0 w-[40rem] h-[40rem] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent -translate-y-1/2 translate-x-1/2 pointer-events-none" />
             <div className="hidden md:block absolute bottom-0 left-0 w-[30rem] h-[30rem] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-black/20 via-transparent to-transparent translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
-            <div className="relative z-10 p-12 md:p-16 flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="relative z-10 p-8 sm:p-12 md:p-16 flex flex-col md:flex-row items-center justify-between gap-6 md:gap-8">
               <div>
-                <h2 className="text-3xl md:text-4xl font-bold font-[var(--font-outfit)] text-white mb-3">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold font-[var(--font-outfit)] text-white mb-2 sm:mb-3">
                   Ready to Find Your Car?
                 </h2>
-                <p className="text-purple-200 text-lg">
+                <p className="text-purple-200 text-sm sm:text-base md:text-lg">
                   Browse 500+ certified used cars. Zero pressure, full transparency.
                 </p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-4 flex-shrink-0">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 flex-shrink-0 w-full sm:w-auto">
                 <Link
                   href="/cars"
-                  className="btn-ghost border-white/40 text-white hover:bg-white/10 py-3 px-8 text-base flex items-center gap-2 justify-center"
+                  className="btn-ghost border-white/40 text-white hover:bg-white/10 py-3 px-6 sm:px-8 text-sm sm:text-base flex items-center gap-2 justify-center"
                 >
                   Browse Cars
                   <ChevronRight className="w-4 h-4" />
                 </Link>
                 <Link
                   href="/chat"
-                  className="bg-white text-purple-800 font-bold rounded-full py-3 px-8 text-base hover:bg-purple-50 transition-all duration-200 flex items-center gap-2 justify-center shadow-lg"
+                  className="bg-white text-purple-800 font-bold rounded-full py-3 px-6 sm:px-8 text-sm sm:text-base hover:bg-purple-50 transition-all duration-200 flex items-center gap-2 justify-center shadow-lg"
                 >
-                  <MessageCircle className="w-5 h-5" />
+                  <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                   Chat with Expert
                 </Link>
               </div>
