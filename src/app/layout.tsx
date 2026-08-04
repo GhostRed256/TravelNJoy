@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://travel-n-joy.vercel.app"),
   title: "TravelNJoy — Premium Used Cars",
   description:
-    "Discover your perfect pre-owned vehicle at TravelNJoy. Browse hundreds of quality certified used cars with transparent pricing, full service history, and expert support.",
+    "Discover your perfect pre-owned vehicle at TravelNJoy. Browse quality certified used cars with transparent pricing, verified documents, and expert support.",
   keywords: [
     "used cars",
     "pre-owned vehicles",
@@ -30,24 +30,36 @@ export const metadata: Metadata = {
     "TravelNJoy",
     "car dealership",
   ],
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/images/logo.jpg", type: "image/jpeg" },
+    ],
+    shortcut: "/icon.svg",
+    apple: "/images/logo.jpg",
+  },
   openGraph: {
     title: "TravelNJoy — Premium Used Cars",
     description:
       "Find your dream used car at TravelNJoy. Transparent pricing, verified vehicles, seamless buying experience.",
-    type: "website",
+    url: "https://travel-n-joy.vercel.app",
     siteName: "TravelNJoy",
+    type: "website",
     images: [
       {
-        url: "/images/logo.jpg",
+        url: "https://travel-n-joy.vercel.app/images/logo.jpg",
         width: 1200,
         height: 1200,
-        alt: "TravelNJoy Logo",
+        alt: "TravelNJoy Premium Used Cars Logo",
       },
     ],
   },
-  icons: {
-    icon: "/images/logo.jpg",
-    apple: "/images/logo.jpg",
+  twitter: {
+    card: "summary_large_image",
+    title: "TravelNJoy — Premium Used Cars",
+    description:
+      "Find your dream used car at TravelNJoy. Transparent pricing, verified vehicles, seamless buying experience.",
+    images: ["https://travel-n-joy.vercel.app/images/logo.jpg"],
   },
 };
 

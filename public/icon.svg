@@ -1,0 +1,24 @@
+<svg width="200" height="200" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <circle cx="50" cy="50" r="48" fill="#0A0A0F" />
+  <circle cx="50" cy="50" r="44" fill="none" stroke="#00F2FE" stroke-width="2" opacity="0.6" filter="url(#glow)" />
+  <g id="Wheel">
+    <circle id="Tire" fill="#181824" stroke="#2D2D42" stroke-width="2" cx="50" cy="50" r="40"></circle>
+    <circle id="Rim-Outer" fill="none" stroke="#8B5CF6" stroke-width="3" cx="50" cy="50" r="32"></circle>
+    <circle id="Rim-Inner" fill="#4B0082" cx="50" cy="50" r="24"></circle>
+    <g id="Spokes" transform="translate(19, 19)" fill="#8B5CF6">
+      <rect x="29" y="0" width="4" height="62" rx="2"></rect>
+      <rect transform="translate(31, 31) rotate(72) translate(-31, -31)" x="29" y="0" width="4" height="62" rx="2"></rect>
+      <rect transform="translate(31, 31) rotate(144) translate(-31, -31)" x="29" y="0" width="4" height="62" rx="2"></rect>
+      <rect transform="translate(31, 31) rotate(216) translate(-31, -31)" x="29" y="0" width="4" height="62" rx="2"></rect>
+      <rect transform="translate(31, 31) rotate(288) translate(-31, -31)" x="29" y="0" width="4" height="62" rx="2"></rect>
+    </g>
+    <circle cx="50" cy="50" r="10" fill="#0A0A0F" stroke="#8B5CF6" stroke-width="2" />
+    <circle cx="50" cy="50" r="5" fill="#00F2FE" />
+  </g>
+</svg>
