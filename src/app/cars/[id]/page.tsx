@@ -12,6 +12,7 @@ import {
 import type { Car } from '@/types/car';
 import { DEMO_CARS, formatPrice, formatMileage, cn, getOptimizedImage } from '@/lib/utils';
 import { trackUserViewCar } from '@/lib/recommendations';
+import BrandLogo from '@/components/BrandLogo';
 import CarDetailSkeleton from '@/components/CarDetailSkeleton';
 import { useSession } from "next-auth/react";
 import toast from 'react-hot-toast';
@@ -363,9 +364,14 @@ export default function CarDetailPage() {
             {/* Price card */}
             <div className="glass rounded-2xl p-6 border border-purple-900/30 sticky top-24">
               <div className="flex items-start justify-between mb-2">
-                <div>
-                  <p className="text-sm text-purple-400 font-medium uppercase tracking-wider">{car.make}</p>
-                  <h1 className="text-2xl font-bold text-white font-[var(--font-outfit)]">{car.modelVariant}</h1>
+                <div className="flex items-center gap-3">
+                  <span className="w-10 h-10 rounded-full bg-white p-1.5 inline-flex items-center justify-center shrink-0 shadow-md">
+                    <BrandLogo make={car.make} className="w-full h-full object-contain" />
+                  </span>
+                  <div>
+                    <p className="text-sm text-purple-400 font-medium uppercase tracking-wider">{car.make}</p>
+                    <h1 className="text-2xl font-bold text-white font-[var(--font-outfit)]">{car.modelVariant}</h1>
+                  </div>
                 </div>
                 <button
                   type="button"

@@ -147,7 +147,10 @@ export default function CarCard({ car, allCars, featured, priority, enable3D = f
         <div className={cn("p-5 flex-1 flex flex-col", enable3D && "preserve-3d")}>
           <div className={cn("flex items-start justify-between gap-2 mb-3", enable3D && "translate-z-20")}>
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2 mb-0.5">
+              <div className="flex items-center gap-1.5 mb-0.5">
+                <div className="w-4 h-4 rounded bg-white dark:bg-slate-100 p-0.5 border border-slate-200/80 shadow-2xs flex items-center justify-center flex-shrink-0">
+                  <BrandLogo make={car.make} className="w-full h-full object-contain" />
+                </div>
                 <span className="text-xs text-purple-700 dark:text-purple-400 font-bold uppercase tracking-wider truncate">{car.make}</span>
                 <span className="text-[10px] bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-300 px-1.5 py-0.5 rounded font-mono border border-purple-200 dark:border-purple-700/30 flex-shrink-0">
                   {getVehicleId(car, allCars)}

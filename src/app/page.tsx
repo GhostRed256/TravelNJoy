@@ -149,8 +149,9 @@ export default function HomePage() {
                 <div className="flex-1 relative">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-purple-600 dark:text-purple-400" />
                   <input
+                    id="hero-search-input"
                     type="text"
-                    placeholder="Search by make, model, or year..."
+                    placeholder="Search brand, model, year, color, fuel..."
                     className="input-dark !pl-12 h-14 text-base shadow-sm"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
@@ -159,10 +160,18 @@ export default function HomePage() {
                     }}
                   />
                 </div>
-                <Link href="/cars" className="btn-primary h-14 px-8 flex items-center gap-2 text-base whitespace-nowrap justify-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const input = document.getElementById('hero-search-input') as HTMLInputElement;
+                    const q = input?.value?.trim() || '';
+                    window.location.href = q ? `/cars?search=${encodeURIComponent(q)}` : '/cars';
+                  }}
+                  className="btn-primary h-14 px-8 flex items-center gap-2 text-base whitespace-nowrap justify-center"
+                >
                   Search Cars
                   <Search className="w-4 h-4" />
-                </Link>
+                </button>
               </div>
 
               {/* Trust chips */}

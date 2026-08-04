@@ -7,6 +7,8 @@ import { useDealOfTheDay } from '@/hooks/useCarsData';
 import { formatPrice, formatMileage, getOptimizedImage } from '@/lib/utils';
 import { use3DTilt } from '@/hooks/use3DTilt';
 
+import BrandLogo from '@/components/BrandLogo';
+
 export default function DealOfTheDay() {
   const { dealCar, originalPrice, savingsText, loading } = useDealOfTheDay();
 
@@ -60,9 +62,14 @@ export default function DealOfTheDay() {
                 </div>
 
                 {/* Make & Title */}
-                <p className="text-sm font-bold uppercase tracking-widest text-purple-700 dark:text-purple-400 mb-1">
-                  {dealCar.make}
-                </p>
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-5 h-5 rounded-md bg-white p-0.5 border border-slate-200/80 shadow-sm flex items-center justify-center flex-shrink-0">
+                    <BrandLogo make={dealCar.make} className="w-full h-full object-contain" />
+                  </div>
+                  <p className="text-sm font-bold uppercase tracking-widest text-purple-700 dark:text-purple-400">
+                    {dealCar.make}
+                  </p>
+                </div>
                 <h2 className="text-3xl md:text-4xl font-bold font-[var(--font-outfit)] text-slate-900 dark:text-white mb-4 leading-tight">
                   {dealCar.modelVariant}
                 </h2>

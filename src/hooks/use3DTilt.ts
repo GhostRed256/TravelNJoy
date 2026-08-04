@@ -62,20 +62,22 @@ export function use3DTilt({
     };
   }, []);
 
-  const defaultStyle: CSSProperties = {
+  const [style, setStyle] = useState<CSSProperties>({
     transform: `perspective(${perspective}px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`,
     transition: `transform ${speed}ms cubic-bezier(0.2, 0.8, 0.2, 1)`,
     transformStyle: 'preserve-3d',
-  };
-
-  const [style, setStyle] = useState<CSSProperties>(defaultStyle);
+  });
 
   const onMouseMove = useCallback(
     (e: MouseEvent<HTMLElement>) => {
       setIsHovered(true);
 
       if (!isHoverable || reducedMotion) {
-        setStyle(defaultStyle);
+        setStyle({
+          transform: `perspective(${perspective}px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`,
+          transition: `transform ${speed}ms cubic-bezier(0.2, 0.8, 0.2, 1)`,
+          transformStyle: 'preserve-3d',
+        });
         return;
       }
 
@@ -95,7 +97,7 @@ export function use3DTilt({
         transformStyle: 'preserve-3d',
       });
     },
-    [isHoverable, reducedMotion, maxTiltDeg, perspective, scale, speed, defaultStyle]
+    [isHoverable, reducedMotion, maxTiltDeg, perspective, scale, speed]
   );
 
   const onMouseLeave = useCallback(() => {

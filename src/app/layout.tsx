@@ -90,7 +90,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="font-[var(--font-inter)] antialiased bg-[#F8F7FF] text-slate-900 dark:bg-[#0A0A0F] dark:text-[#F8F8FF] transition-colors duration-300">
+      <body className="font-[var(--font-inter)] antialiased bg-[#0A0A0F] text-[#F8F8FF] transition-colors duration-300">
         <Providers>
           <div className="relative min-h-screen pb-16 md:pb-0">
             {/* Background gradients */}

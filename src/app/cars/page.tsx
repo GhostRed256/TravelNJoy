@@ -6,6 +6,7 @@ import { Search, SlidersHorizontal, X, ChevronDown, IndianRupee } from 'lucide-r
 import { motion } from 'framer-motion';
 import CarCard from '@/components/CarCard';
 import CarSkeleton from '@/components/CarSkeleton';
+import BrandLogo from '@/components/BrandLogo';
 import { Car, CarFilters, FuelType, TransmissionType, BodyType } from '@/types/car';
 import { DEMO_CARS, formatPrice } from '@/lib/utils';
 import { INDIAN_CAR_BRANDS } from '@/lib/constants';
@@ -104,13 +105,45 @@ function CarsContent() {
 
   const filtered = cars.filter((car) => {
     if (filters.search) {
-      const q = filters.search.toLowerCase();
-      const priceStr = car.quotingPrice?.toString() || '';
-      const featuresStr = (car.features || []).join(' ');
-      const match =
-        `${car.make} ${car.modelVariant} ${car.yearOfManufacture} ${car.color} ${car.carType} ${car.fuel} ${car.transmission} ${car.bodyType || ''} ${car.registrationNo || ''} ${featuresStr}`.toLowerCase().includes(q) ||
-        priceStr.includes(q);
-      if (!match) return false;
+      const q = filters.search.toLowerCase().trim();
+
+      // --- Smart price bracket parsing ---
+      // Patterns: "under 5 lakh", "below 10L", "5-10 lakh", "above 20 lakh", "10 lakh"
+      const lakhMatch = q.match(/(\d+(?:\.\d+)?)\s*(?:lakh|lac|l)\b/i);
+      const underMatch = q.match(/(?:under|below|upto|up\s*to|max|within)\s*(?:₹?\s*)(\d+(?:\.\d+)?)\s*(?:lakh|lac|l)?\b/i);
+      const aboveMatch = q.match(/(?:above|over|min|from)\s*(?:₹?\s*)(\d+(?:\.\d+)?)\s*(?:lakh|lac|l)?\b/i);
+      const rangeMatch = q.match(/(\d+(?:\.\d+)?)\s*(?:-|to)\s*(\d+(?:\.\d+)?)\s*(?:lakh|lac|l)?\b/i);
+
+      let priceFilterApplied = false;
+      if (rangeMatch) {
+        const lo = parseFloat(rangeMatch[1]) * 100000;
+        const hi = parseFloat(rangeMatch[2]) * 100000;
+        if (car.quotingPrice < lo || car.quotingPrice > hi) return false;
+        priceFilterApplied = true;
+      } else if (underMatch) {
+        const cap = parseFloat(underMatch[1]) * (underMatch[0].match(/lakh|lac|l/i) ? 100000 : 1);
+        if (car.quotingPrice > cap) return false;
+        priceFilterApplied = true;
+      } else if (aboveMatch) {
+        const floor = parseFloat(aboveMatch[1]) * (aboveMatch[0].match(/lakh|lac|l/i) ? 100000 : 1);
+        if (car.quotingPrice < floor) return false;
+        priceFilterApplied = true;
+      }
+
+      // If no price filter was parsed, do text search
+      if (!priceFilterApplied) {
+        const priceStr = car.quotingPrice?.toString() || '';
+        const featuresStr = (car.features || []).join(' ');
+        const haystack = [
+          car.make, car.modelVariant, String(car.yearOfManufacture),
+          car.color, car.carType, car.fuel, car.transmission,
+          car.bodyType, car.registrationNo, car.engine,
+          car.condition, car.description, String(car.owners),
+          featuresStr, priceStr
+        ].filter(Boolean).join(' ').toLowerCase();
+
+        if (!haystack.includes(q)) return false;
+      }
     }
     if (filters.make && filters.make !== 'All' && car.make !== filters.make) return false;
     if (filters.minPrice && car.quotingPrice < filters.minPrice) return false;
@@ -157,7 +190,7 @@ function CarsContent() {
               <input
                 id="car-search"
                 type="text"
-                placeholder="Search by brand, model, year..."
+                placeholder="Search brand, model, color, year, fuel, 'under 5 lakh'..."
                 value={filters.search}
                 onChange={(e) => updateFilter('search', e.target.value)}
                 className="input-dark !pl-12 h-12"
@@ -223,12 +256,17 @@ function CarsContent() {
               <button
                 key={m}
                 onClick={() => updateFilter('make', m === 'All' ? '' : m)}
-                className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
                   (m === 'All' && !filters.make) || filters.make === m
                     ? 'gradient-purple text-white shadow-lg shadow-purple-500/20'
                     : 'glass text-gray-400 hover:text-purple-300 border border-purple-900/30 hover:border-purple-500/40'
                 }`}
               >
+                {m !== 'All' && (
+                  <span className="w-4 h-4 rounded-full bg-white p-0.5 inline-flex items-center justify-center shrink-0">
+                    <BrandLogo make={m} className="w-full h-full object-contain" />
+                  </span>
+                )}
                 {m}
               </button>
             ))}
