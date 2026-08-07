@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { storage } from '@/lib/firebase-admin';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,12 +18,13 @@ export async function POST(req: NextRequest) {
     
     // Determine proper MIME type
     let mimeType = file.type || 'image/jpeg';
-    if (!mimeType || mimeType === 'application/octet-stream') {
-      const ext = file.name.split('.').pop()?.toLowerCase();
+    const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+    if (!file.type || file.type === 'application/octet-stream') {
       if (ext === 'avif') mimeType = 'image/avif';
       else if (ext === 'webp') mimeType = 'image/webp';
       else if (ext === 'png') mimeType = 'image/png';
       else if (ext === 'svg') mimeType = 'image/svg+xml';
+      else if (ext === 'pdf') mimeType = 'application/pdf';
       else mimeType = 'image/jpeg';
     }
 
@@ -83,12 +86,11 @@ export async function POST(req: NextRequest) {
     // ----------------------------------------------------
     if (storage) {
       try {
-        const ext = file.name.split('.').pop() || 'png';
         const filename = `${crypto.randomUUID()}.${ext}`;
         const destination = `uploads/${filename}`;
 
         const bucket = storage.bucket();
-        if (bucket && bucket.name) {
+        if (bucket && bucket.name && !bucket.name.includes('undefined')) {
           const fileRef = bucket.file(destination);
           await fileRef.save(buffer, { metadata: { contentType: mimeType } });
           try { await fileRef.makePublic(); } catch { /* ignore ACL warning */ }
@@ -102,41 +104,37 @@ export async function POST(req: NextRequest) {
     }
 
     // ----------------------------------------------------
-    // Tier 3: Free ImgBB API Upload Fallback
+    // Tier 3: Local Storage Fallback (DataLocal / images/cars)
     // ----------------------------------------------------
-    const imgbbKey = process.env.IMGBB_API_KEY || '6d00054441e648841660f513445b08e6';
-    if (imgbbKey) {
-      try {
-        const imgbbForm = new FormData();
-        imgbbForm.append('image', base64Raw);
-
-        const imgbbRes = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, {
-          method: 'POST',
-          body: imgbbForm,
-        });
-
-        const imgbbData = await imgbbRes.json();
-        if (imgbbData?.data?.url || imgbbData?.data?.display_url) {
-          return NextResponse.json({
-            success: true,
-            url: imgbbData.data.url || imgbbData.data.display_url,
-          });
-        }
-        console.error('ImgBB upload warning:', imgbbData);
-      } catch (imgbbErr) {
-        console.error('ImgBB fetch error:', imgbbErr);
-      }
+    try {
+      const isDocument = mimeType === 'application/pdf' || ext === 'pdf';
+      const targetDir = isDocument ? 'public/DataLocal' : 'public/images/cars';
+      const fullDirPath = path.join(process.cwd(), targetDir);
+      
+      // Ensure directory exists
+      await fs.mkdir(fullDirPath, { recursive: true });
+      
+      const filename = `${crypto.randomUUID()}.${ext}`;
+      const filePath = path.join(fullDirPath, filename);
+      
+      await fs.writeFile(filePath, buffer);
+      
+      // Return relative URL for client usage (and sheet sync will prefix origin if needed)
+      const url = isDocument ? `/DataLocal/${filename}` : `/images/cars/${filename}`;
+      return NextResponse.json({ success: true, url });
+    } catch (localErr) {
+      console.error('Local file save failed:', localErr);
     }
 
     // ----------------------------------------------------
-    // Tier 4: Data URL Fallback (100% Fail-Proof Safety Net)
+    // Tier 4: Base64 Data URL Fallback (Absolute last resort)
     // ----------------------------------------------------
+    // We only use this if LOCAL filesystem writing ALSO fails!
     const dataUrl = `data:${mimeType};base64,${base64Raw}`;
     return NextResponse.json({ success: true, url: dataUrl });
 
   } catch (err: any) {
     console.error('Upload route error:', err);
-    // Even on top-level error, return Data URL fallback if possible instead of 500
     return NextResponse.json({ error: err?.message || 'Upload failed' }, { status: 500 });
   }
 }

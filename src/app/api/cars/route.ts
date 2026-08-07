@@ -18,7 +18,26 @@ function syncToSheet(car: Car, action: 'upsert' | 'markSold' | 'delete', carId?:
   if (action === 'delete') {
     payload.carId = carId;
   } else {
-    payload.car = car;
+    // Clone car to avoid mutating the original object sent to Firestore
+    const syncedCar = JSON.parse(JSON.stringify(car));
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://travel-n-joy.vercel.app';
+    
+    // Convert any relative image/document paths to absolute URLs so they are clickable in Sheets
+    if (syncedCar.images && Array.isArray(syncedCar.images)) {
+      syncedCar.images = syncedCar.images.map((img: string) => 
+        img.startsWith('/') && !img.startsWith('//') ? `${baseUrl}${img}` : img
+      );
+    }
+    
+    // Also fix document links if any
+    const docFields = ['docRC', 'docInsurance', 'docPUC', 'docNOC', 'docSellerPAN', 'docSellerAadhar', 'docBuyerPAN', 'docBuyerAadhar', 'docVehicleDetails'];
+    for (const field of docFields) {
+      if (syncedCar[field] && typeof syncedCar[field] === 'string' && syncedCar[field].startsWith('/')) {
+        syncedCar[field] = `${baseUrl}${syncedCar[field]}`;
+      }
+    }
+    
+    payload.car = syncedCar;
   }
 
   // Fire-and-forget — we don't await this
