@@ -8,10 +8,33 @@ function syncToSheet(car: Car) {
   const webAppUrl = process.env.SHEETS_WEBAPP_URL;
   if (!webAppUrl) return;
 
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://travel-n-joy.vercel.app';
+  const syncedCar = JSON.parse(JSON.stringify(car));
+
+  if (syncedCar.images && Array.isArray(syncedCar.images)) {
+    syncedCar.images = syncedCar.images
+      .filter((img: string) => !img.startsWith('data:'))
+      .map((img: string) =>
+        img.startsWith('/') && !img.startsWith('//') ? `${baseUrl}${img}` : img
+      );
+  }
+
+  // Convert relative document paths to absolute URLs
+  const docFields = ['docRC', 'docInsurance', 'docPUC', 'docNOC', 'docSellerPAN', 'docSellerAadhar', 'docBuyerPAN', 'docBuyerAadhar', 'docVehicleDetails'];
+  for (const field of docFields) {
+    if (syncedCar[field] && typeof syncedCar[field] === 'string') {
+      if (syncedCar[field].startsWith('data:')) {
+        syncedCar[field] = '';
+      } else if (syncedCar[field].startsWith('/')) {
+        syncedCar[field] = `${baseUrl}${syncedCar[field]}`;
+      }
+    }
+  }
+
   const payload = {
     action: 'upsert',
     secret: process.env.SYNC_SECRET || 'travelnjoy-sync-2024',
-    car
+    car: syncedCar
   };
 
   fetch(webAppUrl, {

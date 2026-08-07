@@ -14,15 +14,21 @@ function syncToSheet(payload: Record<string, unknown>) {
   const syncedCar = JSON.parse(JSON.stringify(payload.car || {}));
   
   if (syncedCar.images && Array.isArray(syncedCar.images)) {
-    syncedCar.images = syncedCar.images.map((img: string) => 
-      img.startsWith('/') && !img.startsWith('//') ? `${baseUrl}${img}` : img
-    );
+    syncedCar.images = syncedCar.images
+      .filter((img: string) => !img.startsWith('data:'))
+      .map((img: string) => 
+        img.startsWith('/') && !img.startsWith('//') ? `${baseUrl}${img}` : img
+      );
   }
   
   const docFields = ['docRC', 'docInsurance', 'docPUC', 'docNOC', 'docSellerPAN', 'docSellerAadhar', 'docBuyerPAN', 'docBuyerAadhar', 'docVehicleDetails'];
   for (const field of docFields) {
-    if (syncedCar[field] && typeof syncedCar[field] === 'string' && syncedCar[field].startsWith('/')) {
-      syncedCar[field] = `${baseUrl}${syncedCar[field]}`;
+    if (syncedCar[field] && typeof syncedCar[field] === 'string') {
+      if (syncedCar[field].startsWith('data:')) {
+        syncedCar[field] = '';
+      } else if (syncedCar[field].startsWith('/')) {
+        syncedCar[field] = `${baseUrl}${syncedCar[field]}`;
+      }
     }
   }
 

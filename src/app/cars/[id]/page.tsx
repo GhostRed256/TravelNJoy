@@ -174,6 +174,7 @@ export default function CarDetailPage() {
             height={800}
             className="max-h-[85vh] object-contain rounded-2xl"
             onClick={(e) => e.stopPropagation()}
+            onError={(e) => { (e.target as HTMLImageElement).src = '/car-sedan.png'; }}
           />
           <button
             type="button"
@@ -276,6 +277,7 @@ export default function CarDetailPage() {
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                   priority
+                  onError={(e) => { (e.target as HTMLImageElement).src = '/car-sedan.png'; }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
               </div>
@@ -317,7 +319,7 @@ export default function CarDetailPage() {
                       i === imageIndex ? 'border-purple-500 glow-sm' : 'border-purple-900/30 opacity-60 hover:opacity-100'
                     )}
                   >
-                    <Image src={getOptimizedImage(img, 400)} alt="" fill className="object-cover" />
+                    <Image src={getOptimizedImage(img, 400)} alt="" fill className="object-cover" onError={(e) => { (e.target as HTMLImageElement).src = '/car-sedan.png'; }} />
                   </button>
                 ))}
               </div>
@@ -452,17 +454,24 @@ export default function CarDetailPage() {
               )}
             </div>
 
-            {/* Trust badges */}
+            {/* Trust badges & Documents */}
             <div className="glass rounded-2xl p-5 border border-purple-900/30 space-y-3">
               {[
-                { icon: Shield, label: '150-Point Inspection Done' },
-                { icon: CheckCircle2, label: 'Full Service Records Available' },
-                { icon: Star, label: '7-Day Return Policy' },
-              ].map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-3 text-sm text-gray-300">
-                  <Icon className="w-5 h-5 text-purple-400 flex-shrink-0" />
-                  {label}
-                </div>
+                { icon: Shield, label: '150-Point Inspection Done', link: car.docVehicleDetails },
+                { icon: CheckCircle2, label: 'Service Records Available', link: null },
+                { icon: Star, label: '7-Day Return Policy', link: null },
+              ].map(({ icon: Icon, label, link }) => (
+                link ? (
+                  <a key={label} href={link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-sm text-purple-300 hover:text-purple-200 transition-colors cursor-pointer group">
+                    <Icon className="w-5 h-5 text-purple-400 flex-shrink-0 group-hover:scale-110 transition-transform" />
+                    <span className="underline decoration-purple-500/50 underline-offset-4">{label}</span>
+                  </a>
+                ) : (
+                  <div key={label} className="flex items-center gap-3 text-sm text-gray-300">
+                    <Icon className="w-5 h-5 text-purple-400 flex-shrink-0" />
+                    {label}
+                  </div>
+                )
               ))}
             </div>
           </div>

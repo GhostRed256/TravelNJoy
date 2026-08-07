@@ -24,17 +24,31 @@ function syncToSheet(car: Car, action: 'upsert' | 'markSold' | 'delete', carId?:
     
     // Convert any relative image/document paths to absolute URLs so they are clickable in Sheets
     if (syncedCar.images && Array.isArray(syncedCar.images)) {
-      syncedCar.images = syncedCar.images.map((img: string) => 
-        img.startsWith('/') && !img.startsWith('//') ? `${baseUrl}${img}` : img
-      );
+      syncedCar.images = syncedCar.images
+        .filter((img: string) => !img.startsWith('data:')) // Strip data URLs — they break Sheets
+        .map((img: string) => 
+          img.startsWith('/') && !img.startsWith('//') ? `${baseUrl}${img}` : img
+        );
     }
     
     // Also fix document links if any
     const docFields = ['docRC', 'docInsurance', 'docPUC', 'docNOC', 'docSellerPAN', 'docSellerAadhar', 'docBuyerPAN', 'docBuyerAadhar', 'docVehicleDetails'];
     for (const field of docFields) {
-      if (syncedCar[field] && typeof syncedCar[field] === 'string' && syncedCar[field].startsWith('/')) {
-        syncedCar[field] = `${baseUrl}${syncedCar[field]}`;
+      if (syncedCar[field] && typeof syncedCar[field] === 'string') {
+        if (syncedCar[field].startsWith('data:')) {
+          syncedCar[field] = ''; // Strip data URLs
+        } else if (syncedCar[field].startsWith('/')) {
+          syncedCar[field] = `${baseUrl}${syncedCar[field]}`;
+        }
       }
+    }
+    
+    // Strip time from dates to prevent complicating the sheets
+    if (syncedCar.acquisitionDate && typeof syncedCar.acquisitionDate === 'string') {
+      syncedCar.acquisitionDate = syncedCar.acquisitionDate.split('T')[0];
+    }
+    if (syncedCar.soldDate && typeof syncedCar.soldDate === 'string') {
+      syncedCar.soldDate = syncedCar.soldDate.split('T')[0];
     }
     
     payload.car = syncedCar;

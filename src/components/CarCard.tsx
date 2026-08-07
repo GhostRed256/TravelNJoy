@@ -108,9 +108,10 @@ export default function CarCard({ car, allCars, featured, priority, enable3D = f
             fill
             priority={priority && imgIndex === 0}
             loading={priority && imgIndex === 0 ? 'eager' : 'lazy'}
-            unoptimized={previewImages[imgIndex].startsWith('/images/')}
+            unoptimized={previewImages[imgIndex].startsWith('/images/') || previewImages[imgIndex].startsWith('data:')}
             className="object-cover transition-all duration-500 animate-fade-in scale-105 group-hover:scale-110"
             sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+            onError={(e) => { (e.target as HTMLImageElement).src = '/car-sedan.png'; }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-white/80 via-transparent to-transparent dark:from-[#13131F] dark:via-transparent dark:to-transparent" />
 

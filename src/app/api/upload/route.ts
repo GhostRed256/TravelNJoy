@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { storage } from '@/lib/firebase-admin';
-import { promises as fs } from 'fs';
-import path from 'path';
 
 export async function POST(req: NextRequest) {
   try {
@@ -29,7 +26,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ----------------------------------------------------
-    // Tier 1: Cloudinary Upload (If credentials exist)
+    // Cloudinary Upload
     // ----------------------------------------------------
     let cloudName = process.env.CLOUDINARY_CLOUD_NAME || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
     let apiKey = process.env.CLOUDINARY_API_KEY;
@@ -46,92 +43,54 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    if (cloudName && (uploadPreset || (apiKey && apiSecret))) {
-      try {
-        const base64Data = `data:${mimeType};base64,${base64Raw}`;
-        const cForm = new FormData();
-        cForm.append('file', base64Data);
+    if (!cloudName || (!uploadPreset && !(apiKey && apiSecret))) {
+      return NextResponse.json({ error: 'Cloudinary credentials missing' }, { status: 500 });
+    }
 
-        if (uploadPreset) {
-          cForm.append('upload_preset', uploadPreset);
-        } else if (apiKey && apiSecret) {
-          const timestamp = Math.floor(Date.now() / 1000).toString();
-          const folder = 'travelnjoy';
-          const strToSign = `folder=${folder}&timestamp=${timestamp}${apiSecret}`;
-          const signature = crypto.createHash('sha1').update(strToSign).digest('hex');
+    const base64Data = `data:${mimeType};base64,${base64Raw}`;
+    const cForm = new FormData();
+    cForm.append('file', base64Data);
 
-          cForm.append('api_key', apiKey);
-          cForm.append('timestamp', timestamp);
-          cForm.append('folder', folder);
-          cForm.append('signature', signature);
-        }
+    // Pass the original file name so it's saved with its name in the sheet
+    const originalName = file.name ? file.name.split('.').slice(0, -1).join('.') : '';
+    if (originalName) {
+      cForm.append('public_id', originalName);
+    }
 
-        const cRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`, {
-          method: 'POST',
-          body: cForm,
-        });
-
-        const cData = await cRes.json();
-        if (cData.secure_url || cData.url) {
-          return NextResponse.json({ success: true, url: cData.secure_url || cData.url });
-        }
-        console.error('Cloudinary upload warning:', cData);
-      } catch (cErr) {
-        console.error('Cloudinary fetch error:', cErr);
+    if (uploadPreset) {
+      cForm.append('upload_preset', uploadPreset);
+    } else if (apiKey && apiSecret) {
+      const timestamp = Math.floor(Date.now() / 1000).toString();
+      const folder = 'travelnjoy';
+      
+      // Cloudinary requires all parameters (except api_key, file, cloud_name, resource_type) 
+      // to be in alphabetical order for the signature.
+      let strToSign = `folder=${folder}`;
+      if (originalName) {
+        strToSign += `&public_id=${originalName}`;
       }
+      strToSign += `&timestamp=${timestamp}${apiSecret}`;
+      
+      const signature = crypto.createHash('sha1').update(strToSign).digest('hex');
+
+      cForm.append('api_key', apiKey);
+      cForm.append('timestamp', timestamp);
+      cForm.append('folder', folder);
+      cForm.append('signature', signature);
     }
 
-    // ----------------------------------------------------
-    // Tier 2: Firebase Storage Upload
-    // ----------------------------------------------------
-    if (storage) {
-      try {
-        const filename = `${crypto.randomUUID()}.${ext}`;
-        const destination = `uploads/${filename}`;
+    const cRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+      method: 'POST',
+      body: cForm,
+    });
 
-        const bucket = storage.bucket();
-        if (bucket && bucket.name && !bucket.name.includes('undefined')) {
-          const fileRef = bucket.file(destination);
-          await fileRef.save(buffer, { metadata: { contentType: mimeType } });
-          try { await fileRef.makePublic(); } catch { /* ignore ACL warning */ }
-
-          const url = `https://storage.googleapis.com/${bucket.name}/${destination}`;
-          return NextResponse.json({ success: true, url });
-        }
-      } catch (fbErr) {
-        console.error('Firebase Storage upload warning:', fbErr);
-      }
+    const cData = await cRes.json();
+    if (cData.secure_url || cData.url) {
+      return NextResponse.json({ success: true, url: cData.secure_url || cData.url });
     }
-
-    // ----------------------------------------------------
-    // Tier 3: Local Storage Fallback (DataLocal / images/cars)
-    // ----------------------------------------------------
-    try {
-      const isDocument = mimeType === 'application/pdf' || ext === 'pdf';
-      const targetDir = isDocument ? 'public/DataLocal' : 'public/images/cars';
-      const fullDirPath = path.join(process.cwd(), targetDir);
-      
-      // Ensure directory exists
-      await fs.mkdir(fullDirPath, { recursive: true });
-      
-      const filename = `${crypto.randomUUID()}.${ext}`;
-      const filePath = path.join(fullDirPath, filename);
-      
-      await fs.writeFile(filePath, buffer);
-      
-      // Return relative URL for client usage (and sheet sync will prefix origin if needed)
-      const url = isDocument ? `/DataLocal/${filename}` : `/images/cars/${filename}`;
-      return NextResponse.json({ success: true, url });
-    } catch (localErr) {
-      console.error('Local file save failed:', localErr);
-    }
-
-    // ----------------------------------------------------
-    // Tier 4: Base64 Data URL Fallback (Absolute last resort)
-    // ----------------------------------------------------
-    // We only use this if LOCAL filesystem writing ALSO fails!
-    const dataUrl = `data:${mimeType};base64,${base64Raw}`;
-    return NextResponse.json({ success: true, url: dataUrl });
+    
+    console.error('Cloudinary upload warning:', cData);
+    return NextResponse.json({ error: 'Cloudinary upload failed', details: cData }, { status: 500 });
 
   } catch (err: any) {
     console.error('Upload route error:', err);

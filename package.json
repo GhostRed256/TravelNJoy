@@ -13,6 +13,7 @@
     "@opentelemetry/api": "^1.9.1",
     "@types/nodemailer": "^8.0.1",
     "@vercel/analytics": "^2.0.1",
+    "browser-image-compression": "^2.0.2",
     "cloudinary": "^2.10.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.4.0",

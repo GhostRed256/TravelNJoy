@@ -30,59 +30,30 @@ function createEmptyCar(): Partial<Car> {
   };
 }
 
-function compressImage(file: File, maxWidth = 1200, quality = 0.75): Promise<{ file: File; base64: string }> {
-  return new Promise((resolve) => {
-    if (file.type === 'application/pdf' || !file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onload = (e) => resolve({ file, base64: e.target?.result as string });
-      reader.readAsDataURL(file);
-      return;
-    }
+import imageCompression from 'browser-image-compression';
 
-    const img = new window.Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => {
-      URL.revokeObjectURL(url);
-      let { width, height } = img;
-      if (width > maxWidth) {
-        height = Math.round((height * maxWidth) / width);
-        width = maxWidth;
-      }
-      const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.drawImage(img, 0, 0, width, height);
-        canvas.toBlob(
-          (blob) => {
-            if (blob) {
-              const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, ".jpg"), { type: 'image/jpeg' });
-              const reader = new FileReader();
-              reader.onload = (e) => resolve({ file: compressedFile, base64: e.target?.result as string });
-              reader.readAsDataURL(blob);
-            } else {
-              const reader = new FileReader();
-              reader.onload = (e) => resolve({ file, base64: e.target?.result as string });
-              reader.readAsDataURL(file);
-            }
-          },
-          'image/jpeg',
-          quality
-        );
-      } else {
-        const reader = new FileReader();
-        reader.onload = (e) => resolve({ file, base64: e.target?.result as string });
-        reader.readAsDataURL(file);
-      }
+async function compressImage(file: File): Promise<{ file: File; base64: string }> {
+  try {
+    const options = {
+      maxSizeMB: 0.3,
+      maxWidthOrHeight: 1200,
+      useWebWorker: true
     };
-    img.onerror = () => {
+    const compressedFile = await imageCompression(file, options);
+    
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve({ file: compressedFile, base64: e.target?.result as string });
+      reader.readAsDataURL(compressedFile);
+    });
+  } catch (error) {
+    console.error('Compression error, falling back to original:', error);
+    return new Promise((resolve) => {
       const reader = new FileReader();
       reader.onload = (e) => resolve({ file, base64: e.target?.result as string });
       reader.readAsDataURL(file);
-    };
-    img.src = url;
-  });
+    });
+  }
 }
 
 export default function AdminDashboard() {

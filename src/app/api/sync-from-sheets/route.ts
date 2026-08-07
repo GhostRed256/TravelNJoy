@@ -55,13 +55,27 @@ export async function POST(req: NextRequest) {
       const webAppUrl = process.env.SHEETS_WEBAPP_URL;
       if (webAppUrl) {
         try {
+          const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://travel-n-joy.vercel.app';
+          const syncedCar = JSON.parse(JSON.stringify({ ...existingCar, ...updates }));
+          if (syncedCar.images && Array.isArray(syncedCar.images)) {
+            syncedCar.images = syncedCar.images.map((img: string) =>
+              img.startsWith('/') && !img.startsWith('//') ? `${baseUrl}${img}` : img
+            );
+          }
+          const docFields = ['docRC', 'docInsurance', 'docPUC', 'docNOC', 'docSellerPAN', 'docSellerAadhar', 'docBuyerPAN', 'docBuyerAadhar', 'docVehicleDetails'];
+          for (const field of docFields) {
+            if (syncedCar[field] && typeof syncedCar[field] === 'string' && syncedCar[field].startsWith('/')) {
+              syncedCar[field] = `${baseUrl}${syncedCar[field]}`;
+            }
+          }
           await fetch(webAppUrl, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            redirect: 'manual',
             body: JSON.stringify({
               action: 'markSold',
-              secret: process.env.SYNC_SECRET,
-              car: { ...existingCar, ...updates },
+              secret: process.env.SYNC_SECRET || 'travelnjoy-sync-2024',
+              car: syncedCar,
             }),
           });
         } catch (syncErr) {
