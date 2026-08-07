@@ -8,7 +8,7 @@ export const revalidate = 0;
 
 // Fire-and-forget sheet sync — NEVER blocks the response to the client
 function syncToSheet(car: Car, action: 'upsert' | 'markSold' | 'delete', carId?: string) {
-  const webAppUrl = process.env.SHEETS_WEBAPP_URL;
+  const webAppUrl = process.env.SHEETS_WEBAPP_URL || 'https://script.google.com/macros/s/AKfycbwqpt5gVDdCx_tO5c8J8Lz1TCH2ZETG-oOIxaofpHQzyZiVvXhmyKMnALOA9Qwju_T7/exec';
   if (!webAppUrl) return;
 
   const payload: Record<string, unknown> = {

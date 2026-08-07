@@ -5,7 +5,7 @@ import { sendAdminEmail, sendCustomerEmail } from '@/lib/email';
 
 // Fire-and-forget sheet sync
 function syncToSheet(payload: Record<string, unknown>) {
-  const webAppUrl = process.env.SHEETS_WEBAPP_URL;
+  const webAppUrl = process.env.SHEETS_WEBAPP_URL || 'https://script.google.com/macros/s/AKfycbwqpt5gVDdCx_tO5c8J8Lz1TCH2ZETG-oOIxaofpHQzyZiVvXhmyKMnALOA9Qwju_T7/exec';
   if (!webAppUrl) return;
 
   // redirect:'manual' prevents Apps Script 302 from converting POST→GET (which causes "doGet not found")

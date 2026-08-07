@@ -346,9 +346,9 @@ function carToRowData(car) {
     car.odometer || '',                                 // H=7  Odometer
     car.acquisitionDate || '',                          // I=8  Acquisition Date
     car.rcName || '',                                   // J=9  RC Name
-    formatPhotos(car.images),                           // K=10 Car Photos
-    linkDoc(car.docVehicleDetails, 'Vehicle Details'),  // L=11 Doc: Vehicle Details
-    linkDoc(car.docRC, 'RC Doc'),                       // M=12 Doc: RC
+    '',                                                 // K=10 Car Photos
+    '',                                                 // L=11 Doc: Vehicle Details
+    '',                                                 // M=12 Doc: RC
     linkDoc(car.docInsurance, 'Insurance Doc'),         // N=13 Doc: Insurance
     linkDoc(car.docPUC, 'PUC Doc'),                     // O=14 Doc: PUC
     linkDoc(car.docNOC, 'NOC Doc'),                     // P=15 Doc: NOC
@@ -364,6 +364,36 @@ function carToRowData(car) {
     car.bodyType ? car.bodyType.replace('_', '/') : '', // Z=25 Body Type
     car.transmission || ''                              // AA=26 Transmission
   ];
+}
+
+function applyRichText(sheet, row, colIndex, urls, baseLabel) {
+  if (!urls || urls.length === 0) {
+    sheet.getRange(row, colIndex).setValue('');
+    return;
+  }
+  var richTextBuilder = SpreadsheetApp.newRichTextValue();
+  var text = '';
+  var linkPositions = [];
+  
+  for (var i = 0; i < urls.length; i++) {
+    var label = (urls.length === 1) ? baseLabel : (baseLabel + ' ' + (i + 1));
+    var start = text.length;
+    text += label;
+    var end = text.length;
+    linkPositions.push({ start: start, end: end, url: urls[i] });
+    
+    if (i < urls.length - 1) {
+      text += '\n';
+    }
+  }
+  
+  richTextBuilder.setText(text);
+  for (var j = 0; j < linkPositions.length; j++) {
+    var pos = linkPositions[j];
+    richTextBuilder.setLinkUrl(pos.start, pos.end, pos.url);
+  }
+  
+  sheet.getRange(row, colIndex).setRichTextValue(richTextBuilder.build());
 }
 
 /**
@@ -387,7 +417,16 @@ function handleUpsert(car) {
       if (!listedSheet) listedSheet = ss.insertSheet(CONFIG.TAB_LISTED);
       ensureHeaders(listedSheet);
       listedSheet.appendRow(rowData);
-      return listedSheet.getLastRow();
+      var newRow = listedSheet.getLastRow();
+      applyRichText(listedSheet, newRow, 11, extractUrls(car.images), 'Car Photo');
+      applyRichText(listedSheet, newRow, 12, extractUrls(car.docVehicleDetails), 'Vehicle Details');
+      applyRichText(listedSheet, newRow, 13, extractUrls(car.docRC), 'RC Doc');
+      applyRichText(listedSheet, newRow, 14, extractUrls(car.docInsurance), 'Insurance Doc');
+      applyRichText(listedSheet, newRow, 15, extractUrls(car.docPUC), 'PUC Doc');
+      applyRichText(listedSheet, newRow, 16, extractUrls(car.docNOC), 'NOC Doc');
+      applyRichText(listedSheet, newRow, 17, extractUrls(car.docSellerPAN), 'Seller PAN');
+      applyRichText(listedSheet, newRow, 18, extractUrls(car.docSellerAadhar), 'Seller Aadhar');
+      return newRow;
     }
 
     if (car.status === 'sold' && existing.sheet.getName() === CONFIG.TAB_LISTED) {
@@ -396,14 +435,40 @@ function handleUpsert(car) {
       if (!soldSheet) soldSheet = ss.insertSheet(CONFIG.TAB_SOLD);
       ensureHeaders(soldSheet);
       soldSheet.appendRow(rowData);
-      return soldSheet.getLastRow();
+      var newRowSold = soldSheet.getLastRow();
+      applyRichText(soldSheet, newRowSold, 11, extractUrls(car.images), 'Car Photo');
+      applyRichText(soldSheet, newRowSold, 12, extractUrls(car.docVehicleDetails), 'Vehicle Details');
+      applyRichText(soldSheet, newRowSold, 13, extractUrls(car.docRC), 'RC Doc');
+      applyRichText(soldSheet, newRowSold, 14, extractUrls(car.docInsurance), 'Insurance Doc');
+      applyRichText(soldSheet, newRowSold, 15, extractUrls(car.docPUC), 'PUC Doc');
+      applyRichText(soldSheet, newRowSold, 16, extractUrls(car.docNOC), 'NOC Doc');
+      applyRichText(soldSheet, newRowSold, 17, extractUrls(car.docSellerPAN), 'Seller PAN');
+      applyRichText(soldSheet, newRowSold, 18, extractUrls(car.docSellerAadhar), 'Seller Aadhar');
+      return newRowSold;
     }
 
     existing.sheet.getRange(existing.row, 1, 1, rowData.length).setValues([rowData]);
+    applyRichText(existing.sheet, existing.row, 11, extractUrls(car.images), 'Car Photo');
+    applyRichText(existing.sheet, existing.row, 12, extractUrls(car.docVehicleDetails), 'Vehicle Details');
+    applyRichText(existing.sheet, existing.row, 13, extractUrls(car.docRC), 'RC Doc');
+    applyRichText(existing.sheet, existing.row, 14, extractUrls(car.docInsurance), 'Insurance Doc');
+    applyRichText(existing.sheet, existing.row, 15, extractUrls(car.docPUC), 'PUC Doc');
+    applyRichText(existing.sheet, existing.row, 16, extractUrls(car.docNOC), 'NOC Doc');
+    applyRichText(existing.sheet, existing.row, 17, extractUrls(car.docSellerPAN), 'Seller PAN');
+    applyRichText(existing.sheet, existing.row, 18, extractUrls(car.docSellerAadhar), 'Seller Aadhar');
     return existing.row;
   } else {
     sheet.appendRow(rowData);
-    return sheet.getLastRow();
+    var addedRow = sheet.getLastRow();
+    applyRichText(sheet, addedRow, 11, extractUrls(car.images), 'Car Photo');
+    applyRichText(sheet, addedRow, 12, extractUrls(car.docVehicleDetails), 'Vehicle Details');
+    applyRichText(sheet, addedRow, 13, extractUrls(car.docRC), 'RC Doc');
+    applyRichText(sheet, addedRow, 14, extractUrls(car.docInsurance), 'Insurance Doc');
+    applyRichText(sheet, addedRow, 15, extractUrls(car.docPUC), 'PUC Doc');
+    applyRichText(sheet, addedRow, 16, extractUrls(car.docNOC), 'NOC Doc');
+    applyRichText(sheet, addedRow, 17, extractUrls(car.docSellerPAN), 'Seller PAN');
+    applyRichText(sheet, addedRow, 18, extractUrls(car.docSellerAadhar), 'Seller Aadhar');
+    return addedRow;
   }
 }
 
@@ -424,12 +489,38 @@ function handleMarkSold(car) {
   if (existing) {
     if (existing.sheet.getName() === CONFIG.TAB_SOLD) {
       existing.sheet.getRange(existing.row, 1, 1, rowData.length).setValues([rowData]);
+      applyRichText(existing.sheet, existing.row, 11, extractUrls(car.images), 'Car Photo');
+      applyRichText(existing.sheet, existing.row, 12, extractUrls(car.docVehicleDetails), 'Vehicle Details');
+      applyRichText(existing.sheet, existing.row, 13, extractUrls(car.docRC), 'RC Doc');
+      applyRichText(existing.sheet, existing.row, 14, extractUrls(car.docInsurance), 'Insurance Doc');
+      applyRichText(existing.sheet, existing.row, 15, extractUrls(car.docPUC), 'PUC Doc');
+      applyRichText(existing.sheet, existing.row, 16, extractUrls(car.docNOC), 'NOC Doc');
+      applyRichText(existing.sheet, existing.row, 17, extractUrls(car.docSellerPAN), 'Seller PAN');
+      applyRichText(existing.sheet, existing.row, 18, extractUrls(car.docSellerAadhar), 'Seller Aadhar');
     } else {
       existing.sheet.deleteRow(existing.row);
       soldSheet.appendRow(rowData);
+      var soldRow = soldSheet.getLastRow();
+      applyRichText(soldSheet, soldRow, 11, extractUrls(car.images), 'Car Photo');
+      applyRichText(soldSheet, soldRow, 12, extractUrls(car.docVehicleDetails), 'Vehicle Details');
+      applyRichText(soldSheet, soldRow, 13, extractUrls(car.docRC), 'RC Doc');
+      applyRichText(soldSheet, soldRow, 14, extractUrls(car.docInsurance), 'Insurance Doc');
+      applyRichText(soldSheet, soldRow, 15, extractUrls(car.docPUC), 'PUC Doc');
+      applyRichText(soldSheet, soldRow, 16, extractUrls(car.docNOC), 'NOC Doc');
+      applyRichText(soldSheet, soldRow, 17, extractUrls(car.docSellerPAN), 'Seller PAN');
+      applyRichText(soldSheet, soldRow, 18, extractUrls(car.docSellerAadhar), 'Seller Aadhar');
     }
   } else {
     soldSheet.appendRow(rowData);
+    var newSoldRow = soldSheet.getLastRow();
+    applyRichText(soldSheet, newSoldRow, 11, extractUrls(car.images), 'Car Photo');
+    applyRichText(soldSheet, newSoldRow, 12, extractUrls(car.docVehicleDetails), 'Vehicle Details');
+    applyRichText(soldSheet, newSoldRow, 13, extractUrls(car.docRC), 'RC Doc');
+    applyRichText(soldSheet, newSoldRow, 14, extractUrls(car.docInsurance), 'Insurance Doc');
+    applyRichText(soldSheet, newSoldRow, 15, extractUrls(car.docPUC), 'PUC Doc');
+    applyRichText(soldSheet, newSoldRow, 16, extractUrls(car.docNOC), 'NOC Doc');
+    applyRichText(soldSheet, newSoldRow, 17, extractUrls(car.docSellerPAN), 'Seller PAN');
+    applyRichText(soldSheet, newSoldRow, 18, extractUrls(car.docSellerAadhar), 'Seller Aadhar');
   }
 }
 

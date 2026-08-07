@@ -291,7 +291,13 @@ export default function AdminDashboard() {
                 else reject(new Error(data.error || 'No URL returned'));
               } catch { reject(new Error('Invalid response')); }
             } else {
-              reject(new Error(`Upload failed (${xhr.status})`));
+              let errMsg = `Upload failed (${xhr.status})`;
+              try {
+                const data = JSON.parse(xhr.responseText);
+                if (data.error) errMsg = `${errMsg}: ${data.error}`;
+                if (data.details) errMsg = `${errMsg} - ${JSON.stringify(data.details)}`;
+              } catch { /* ignore */ }
+              reject(new Error(errMsg));
             }
           };
           xhr.onerror = () => reject(new Error('Network error during upload'));

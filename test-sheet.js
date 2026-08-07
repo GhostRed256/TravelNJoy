@@ -1,32 +1,23 @@
 async function testSheet() {
-  console.log("Testing sheet sync...");
   const webAppUrl = process.env.SHEETS_WEBAPP_URL || 'https://script.google.com/macros/s/AKfycbwfR5h4XZmI1iF_krlpImUKWnu2tnm5rui_9CYeUmr1-AMDDC8FG-HoaSB5m4VcQ3jd/exec';
-  const syncSecret = process.env.SYNC_SECRET || 'travelnjoy-sync-2024';
-
   const payload = {
-    secret: syncSecret,
+    secret: 'travelnjoy-sync-2024',
     action: 'upsert',
     car: {
-      id: 'test-id-123',
-      make: 'Test',
-      modelVariant: 'Test Variant',
-      acquisitionDate: '2024-01-01',
-      soldDate: '2024-01-02',
-      images: ['https://res.cloudinary.com/demo/image/upload/sample.jpg'],
-      docVehicleDetails: 'https://res.cloudinary.com/demo/image/upload/sample.pdf'
+      id: 'test-id-999',
+      make: 'Test Make',
+      rcName: 'Test RC',
+      docRC: 'https://example.com/rc',
+      docInsurance: 'https://example.com/ins',
+      docPUC: 'https://example.com/puc',
+      docNOC: 'https://example.com/noc',
+      docSellerPAN: 'https://example.com/pan',
+      docVehicleDetails: 'https://example.com/veh'
     }
   };
-
   try {
-    const res = await fetch(webAppUrl, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    });
-    const text = await res.text();
-    console.log("Response:", text);
-  } catch (err) {
-    console.error(err);
-  }
+    const res = await fetch(webAppUrl, { method: 'POST', body: JSON.stringify(payload) });
+    console.log(await res.text());
+  } catch (e) { console.error(e); }
 }
-
 testSheet();
