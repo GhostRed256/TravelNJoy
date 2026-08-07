@@ -9,11 +9,28 @@ function syncToSheet(payload: Record<string, unknown>) {
   if (!webAppUrl) return;
 
   // redirect:'manual' prevents Apps Script 302 from converting POST→GET (which causes "doGet not found")
+  
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://travel-n-joy.vercel.app';
+  const syncedCar = JSON.parse(JSON.stringify(payload.car || {}));
+  
+  if (syncedCar.images && Array.isArray(syncedCar.images)) {
+    syncedCar.images = syncedCar.images.map((img: string) => 
+      img.startsWith('/') && !img.startsWith('//') ? `${baseUrl}${img}` : img
+    );
+  }
+  
+  const docFields = ['docRC', 'docInsurance', 'docPUC', 'docNOC', 'docSellerPAN', 'docSellerAadhar', 'docBuyerPAN', 'docBuyerAadhar', 'docVehicleDetails'];
+  for (const field of docFields) {
+    if (syncedCar[field] && typeof syncedCar[field] === 'string' && syncedCar[field].startsWith('/')) {
+      syncedCar[field] = `${baseUrl}${syncedCar[field]}`;
+    }
+  }
+
   fetch(webAppUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     redirect: 'manual',
-    body: JSON.stringify({ ...payload, secret: process.env.SYNC_SECRET || 'travelnjoy-sync-2024' }),
+    body: JSON.stringify({ ...payload, car: syncedCar, secret: process.env.SYNC_SECRET || 'travelnjoy-sync-2024' }),
   }).catch((err) => {
     console.error('Sheet sync failed:', err?.message || err);
   });
