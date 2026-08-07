@@ -1,13 +1,11 @@
 const fs = require('fs');
 
 async function testUpload() {
-  console.log("Fetching a real image...");
-  const resImage = await fetch('https://upload.wikimedia.org/wikipedia/commons/a/a3/Eq_it-na_pizza-margherita_sep2005_sml.jpg');
-  const buffer = await resImage.arrayBuffer();
+  const logo = fs.readFileSync('public/logo.png');
+  const blob = new Blob([logo], { type: 'image/png' });
   
-  const blob = new Blob([buffer], { type: 'image/jpeg' });
   const formData = new FormData();
-  formData.append('file', blob, 'pizza.jpg');
+  formData.append('file', blob, 'WhatsApp Image 2026-08-02 at 8.59.50 PM.jpeg');
 
   console.log("Sending to local server...");
   try {

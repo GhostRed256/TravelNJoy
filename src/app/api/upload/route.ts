@@ -52,8 +52,10 @@ export async function POST(req: NextRequest) {
     cForm.append('file', base64Data);
 
     // Pass the original file name so it's saved with its name in the sheet
-    const originalName = file.name ? file.name.split('.').slice(0, -1).join('.') : '';
+    let originalName = file.name ? file.name.split('.').slice(0, -1).join('.') : '';
     if (originalName) {
+      // Cloudinary signature calculation gets messed up if there are spaces or special characters in the public_id.
+      originalName = originalName.replace(/[^a-zA-Z0-9_-]/g, '-');
       cForm.append('public_id', originalName);
     }
 
