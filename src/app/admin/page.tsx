@@ -714,7 +714,7 @@ export default function AdminDashboard() {
                     <label className="text-xs text-gray-400 block mb-2">Fuel</label>
                     <div className="relative">
                       <select value={editingCar.fuel || 'petrol'} onChange={e => setEditingCar(p => ({ ...p, fuel: e.target.value as FuelType }))} className="select-dark">
-                        {['petrol','diesel','electric','hybrid','cng'].map(f => <option key={f} value={f}>{f}</option>)}
+                        {['petrol','diesel','electric','hybrid','cng','e10','e20','pure petrol'].map(f => <option key={f} value={f}>{f}</option>)}
                       </select>
                       <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-400 pointer-events-none" />
                     </div>

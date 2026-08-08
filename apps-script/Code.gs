@@ -69,7 +69,7 @@ const CONFIG = {
 // V=21 Buyer Address
 // W=22 Sold Date
 // X=23 Last Updated
-// Y=24 (Column 1 — empty spacer)
+// Y=24 Fuel Type
 // Z=25 Body Type
 // AA=26 Transmission
 
@@ -81,16 +81,19 @@ function syncAllCarsToWebsite() {
   var sheet = ss.getSheetByName(CONFIG.TAB_LISTED);
   if (!sheet) return;
 
-  var data = sheet.getDataRange().getValues();
+  var range = sheet.getDataRange();
+  var data = range.getValues();
+  var richTexts = range.getRichTextValues();
   if (data.length <= 1) return;
 
   var successCount = 0;
   for (var i = 1; i < data.length; i++) {
     var row = data[i];
+    var richRow = richTexts[i];
     var carId = row[0];
     if (!carId) continue;
 
-    var car = rowToCar(row);
+    var car = rowToCar(row, richRow);
 
     try {
       UrlFetchApp.fetch(CONFIG.VERCEL_API_URL + '/api/sync-from-sheets', {
@@ -112,7 +115,24 @@ function syncAllCarsToWebsite() {
  * Convert a sheet row (array of cell values) into a car object.
  * Uses the COLUMN MAP above — every index is explicit so nothing shifts.
  */
-function rowToCar(data) {
+function rowToCar(data, richRow) {
+  var extract = function(colIndex) {
+    var urls = [];
+    if (richRow && richRow[colIndex]) {
+      var runs = richRow[colIndex].getRuns();
+      for (var r = 0; r < runs.length; r++) {
+        var url = runs[r].getLinkUrl();
+        if (url && urls.indexOf(url) === -1) {
+          urls.push(url);
+        }
+      }
+    }
+    if (urls.length === 0) {
+      urls = extractUrls(data[colIndex]);
+    }
+    return urls;
+  };
+
   return {
     id:                 data[0]  || '',
     status:             (data[1] || '').toString().toLowerCase(),
@@ -124,21 +144,23 @@ function rowToCar(data) {
     odometer:           data[7]  || '',
     acquisitionDate:    data[8]  || '',
     rcName:             data[9]  || '',
-    images:             data[10] ? extractUrls(data[10]) : [],
-    docVehicleDetails:  data[11] ? extractUrls(data[11])[0] || '' : '',
-    docRC:              data[12] ? extractUrls(data[12])[0] || '' : '',
-    docInsurance:       data[13] ? extractUrls(data[13])[0] || '' : '',
-    docPUC:             data[14] ? extractUrls(data[14])[0] || '' : '',
-    docNOC:             data[15] ? extractUrls(data[15])[0] || '' : '',
-    docSellerPAN:       data[16] ? extractUrls(data[16])[0] || '' : '',
-    docSellerAadhar:    data[17] ? extractUrls(data[17])[0] || '' : '',
+    images:             extract(10),
+    docVehicleDetails:  extract(11)[0] || '',
+    docRC:              extract(12)[0] || '',
+    docInsurance:       extract(13)[0] || '',
+    docPUC:             extract(14)[0] || '',
+    docNOC:             extract(15)[0] || '',
+    docSellerPAN:       extract(16)[0] || '',
+    docSellerAadhar:    extract(17)[0] || '',
     buyerName:          data[18] || '',
     buyerPAN:           data[19] || '',
     buyerAadhar:        data[20] || '',
     buyerAddress:       data[21] || '',
     soldDate:           data[22] || '',
+    fuel:               data[24] ? data[24].toString().toLowerCase() : '',
     bodyType:           data[25] ? data[25].toString().toLowerCase().replace('/', '_') : '',
-    transmission:       data[26] ? data[26].toString().toLowerCase() : ''
+    transmission:       data[26] ? data[26].toString().toLowerCase() : '',
+    color:              data[27] || ''
   };
 }
 
@@ -306,7 +328,7 @@ function ensureHeaders(sheet) {
     'Doc: Vehicle Details', 'Doc: RC', 'Doc: Insurance', 'Doc: PUC', 'Doc: NOC',
     'Doc: Seller PAN', 'Doc: Seller Aadhar',
     'Buyer Name', 'Buyer PAN', 'Buyer Aadhar', 'Buyer Address', 'Sold Date', 'Last Updated',
-    '', 'Body Type', 'Transmission'
+    'Fuel Type', 'Body Type', 'Transmission', 'Color'
   ];
 
   if (sheet.getLastRow() === 0) {
@@ -317,7 +339,7 @@ function ensureHeaders(sheet) {
 }
 
 /**
- * Converts Car object to an array of row values matching the 27-column layout.
+ * Converts Car object to an array of row values matching the 28-column layout.
  */
 function carToRowData(car) {
   var linkDoc = function(docValue, label) {
@@ -334,6 +356,11 @@ function carToRowData(car) {
     return '=HYPERLINK("' + urls[0] + '", "Car Photo (' + urls.length + ' photos)")';
   };
 
+  var formatDateOnly = function(dateStr) {
+    if (!dateStr) return '';
+    return dateStr.split('T')[0];
+  };
+
   // Must return exactly 27 values matching the column map
   return [
     car.id || '',                                       // A=0  Car ID
@@ -344,7 +371,7 @@ function carToRowData(car) {
     car.yearOfManufacture || '',                        // F=5  Year of Manufacture
     car.quotingPrice || '',                             // G=6  Quoting Price
     car.odometer || '',                                 // H=7  Odometer
-    car.acquisitionDate || '',                          // I=8  Acquisition Date
+    formatDateOnly(car.acquisitionDate),                // I=8  Acquisition Date
     car.rcName || '',                                   // J=9  RC Name
     '',                                                 // K=10 Car Photos
     '',                                                 // L=11 Doc: Vehicle Details
@@ -358,11 +385,12 @@ function carToRowData(car) {
     car.buyerPAN || '',                                 // T=19 Buyer PAN
     car.buyerAadhar || '',                              // U=20 Buyer Aadhar
     car.buyerAddress || '',                             // V=21 Buyer Address
-    car.soldDate || '',                                 // W=22 Sold Date
-    new Date().toISOString(),                           // X=23 Last Updated
-    '',                                                 // Y=24 Column 1 (spacer)
+    formatDateOnly(car.soldDate),                       // W=22 Sold Date
+    Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "yyyy-MM-dd HH:mm:ss"), // X=23 Last Updated
+    car.fuel || '',                                     // Y=24 Fuel Type
     car.bodyType ? car.bodyType.replace('_', '/') : '', // Z=25 Body Type
-    car.transmission || ''                              // AA=26 Transmission
+    car.transmission || '',                             // AA=26 Transmission
+    car.color || ''                                      // AB=27 Color
   ];
 }
 

@@ -1,5 +1,5 @@
 export type CarStatus = 'available' | 'sold' | 'reserved';
-export type FuelType = 'petrol' | 'diesel' | 'electric' | 'hybrid' | 'cng';
+export type FuelType = 'petrol' | 'diesel' | 'electric' | 'hybrid' | 'cng' | 'e10' | 'e20' | 'pure petrol';
 export type TransmissionType = 'manual' | 'automatic' | 'cvt';
 export type BodyType = 'sedan' | 'suv' | 'hatchback' | 'muv_mpv' | 'crossover' | 'pickup' | 'other';
 

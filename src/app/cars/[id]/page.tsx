@@ -18,7 +18,7 @@ import { useSession } from "next-auth/react";
 import toast from 'react-hot-toast';
 
 const fuelEmoji: Record<string, string> = {
-  petrol: '⛽', diesel: '🛢️', electric: '⚡', hybrid: '🔋', cng: '🌿',
+  petrol: '⛽', diesel: '🛢️', electric: '⚡', hybrid: '🔋', cng: '🌿', e10: '⛽', e20: '⛽', 'pure petrol': '⛽',
 };
 
 export default function CarDetailPage() {

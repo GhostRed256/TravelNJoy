@@ -6,9 +6,9 @@ import type { Car } from '@/types/car';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-// Fire-and-forget sheet sync — NEVER blocks the response to the client
-function syncToSheet(car: Car, action: 'upsert' | 'markSold' | 'delete', carId?: string) {
-  const webAppUrl = process.env.SHEETS_WEBAPP_URL || 'https://script.google.com/macros/s/AKfycbwqpt5gVDdCx_tO5c8J8Lz1TCH2ZETG-oOIxaofpHQzyZiVvXhmyKMnALOA9Qwju_T7/exec';
+// Sheet sync — must be awaited on Vercel (serverless functions terminate after response)
+async function syncToSheet(car: Car, action: 'upsert' | 'markSold' | 'delete', carId?: string) {
+  const webAppUrl = process.env.SHEETS_WEBAPP_URL || 'https://script.google.com/macros/s/AKfycbzagP2G8OpPi7mY3gLHQVGHBpMsYJE4sbG2gZWxfxJuz7E2_rC6wPzFFkj9LDBt5wFt/exec';
   if (!webAppUrl) return;
 
   const payload: Record<string, unknown> = {
@@ -18,32 +18,28 @@ function syncToSheet(car: Car, action: 'upsert' | 'markSold' | 'delete', carId?:
   if (action === 'delete') {
     payload.carId = carId;
   } else {
-    // Clone car to avoid mutating the original object sent to Firestore
     const syncedCar = JSON.parse(JSON.stringify(car));
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://travel-n-joy.vercel.app';
     
-    // Convert any relative image/document paths to absolute URLs so they are clickable in Sheets
     if (syncedCar.images && Array.isArray(syncedCar.images)) {
       syncedCar.images = syncedCar.images
-        .filter((img: string) => !img.startsWith('data:')) // Strip data URLs — they break Sheets
+        .filter((img: string) => !img.startsWith('data:'))
         .map((img: string) => 
           img.startsWith('/') && !img.startsWith('//') ? `${baseUrl}${img}` : img
         );
     }
     
-    // Also fix document links if any
     const docFields = ['docRC', 'docInsurance', 'docPUC', 'docNOC', 'docSellerPAN', 'docSellerAadhar', 'docBuyerPAN', 'docBuyerAadhar', 'docVehicleDetails'];
     for (const field of docFields) {
       if (syncedCar[field] && typeof syncedCar[field] === 'string') {
         if (syncedCar[field].startsWith('data:')) {
-          syncedCar[field] = ''; // Strip data URLs
+          syncedCar[field] = '';
         } else if (syncedCar[field].startsWith('/')) {
           syncedCar[field] = `${baseUrl}${syncedCar[field]}`;
         }
       }
     }
     
-    // Strip time from dates to prevent complicating the sheets
     if (syncedCar.acquisitionDate && typeof syncedCar.acquisitionDate === 'string') {
       syncedCar.acquisitionDate = syncedCar.acquisitionDate.split('T')[0];
     }
@@ -54,32 +50,26 @@ function syncToSheet(car: Car, action: 'upsert' | 'markSold' | 'delete', carId?:
     payload.car = syncedCar;
   }
 
-  // Fire-and-forget — we don't await this
-  // IMPORTANT: redirect:'manual' prevents Apps Script 302 redirect from converting POST→GET (which breaks doPost)
-  fetch(webAppUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    redirect: 'manual',
-    body: JSON.stringify(payload),
-  })
-    .then(async (res) => {
-      // With redirect:'manual' we get a 302 opaque response — that's fine, Apps Script processed the POST
-      // For upsert, try to follow manually if we get a real 200 back
-      if ((res.ok || res.type === 'opaqueredirect') && action === 'upsert') {
-        try {
-          if (res.ok) {
-            const text = await res.text();
-            const data = JSON.parse(text);
-            if (data.success && data.sheetRow) {
-              await db.collection('cars').doc(car.id).update({ sheetRow: data.sheetRow });
-            }
-          }
-        } catch { /* ignore */ }
-      }
-    })
-    .catch((err) => {
-      console.error(`Sheet sync (${action}) failed:`, err?.message || err);
+  try {
+    const res = await fetch(webAppUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      redirect: 'manual',
+      body: JSON.stringify(payload),
     });
+    // Try to save sheetRow if we got a real response
+    if (res.ok && action === 'upsert') {
+      try {
+        const text = await res.text();
+        const data = JSON.parse(text);
+        if (data.success && data.sheetRow) {
+          await db.collection('cars').doc(car.id).update({ sheetRow: data.sheetRow });
+        }
+      } catch { /* ignore parse errors */ }
+    }
+  } catch (err: any) {
+    console.error(`Sheet sync (${action}) failed:`, err?.message || err);
+  }
 }
 
 export async function GET(req: NextRequest) {
@@ -131,7 +121,7 @@ export async function POST(req: NextRequest) {
     await db.collection('cars').doc(car.id).set(car);
 
     // 2. Fire-and-forget sync to Google Sheet
-    syncToSheet(car, 'upsert');
+    await syncToSheet(car, 'upsert');
 
     return NextResponse.json({ success: true, car });
   } catch (err: unknown) {

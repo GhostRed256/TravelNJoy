@@ -13,7 +13,7 @@ import { INDIAN_CAR_BRANDS } from '@/lib/constants';
 import { trackUserSearch } from '@/lib/recommendations';
 
 const FALLBACK_MAKES = INDIAN_CAR_BRANDS;
-const FUEL_TYPES: FuelType[] = ['petrol', 'diesel', 'electric', 'hybrid', 'cng'];
+const FUEL_TYPES: FuelType[] = ['petrol', 'diesel', 'electric', 'hybrid', 'cng', 'e10', 'e20', 'pure petrol'];
 const TRANSMISSION_TYPES: TransmissionType[] = ['manual', 'automatic', 'cvt'];
 const BODY_TYPES: BodyType[] = ['sedan', 'suv', 'hatchback', 'muv_mpv', 'crossover', 'pickup', 'other'];
 

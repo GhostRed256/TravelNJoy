@@ -3,9 +3,10 @@ import { db } from '@/lib/firebase-admin';
 import type { Car } from '@/types/car';
 import { sendAdminEmail, sendCustomerEmail } from '@/lib/email';
 
-// Fire-and-forget sheet sync
-function syncToSheet(payload: Record<string, unknown>) {
-  const webAppUrl = process.env.SHEETS_WEBAPP_URL || 'https://script.google.com/macros/s/AKfycbwqpt5gVDdCx_tO5c8J8Lz1TCH2ZETG-oOIxaofpHQzyZiVvXhmyKMnALOA9Qwju_T7/exec';
+// Sheet sync — must be awaited on Vercel (serverless functions terminate after response)
+async function syncToSheet(payload: Record<string, unknown>) {
+  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzagP2G8OpPi7mY3gLHQVGHBpMsYJE4sbG2gZWxfxJuz7E2_rC6wPzFFkj9LDBt5wFt/exec';
+  const webAppUrl = process.env.SHEETS_WEBAPP_URL || GOOGLE_SCRIPT_URL;
   if (!webAppUrl) return;
 
   // redirect:'manual' prevents Apps Script 302 from converting POST→GET (which causes "doGet not found")
@@ -32,14 +33,16 @@ function syncToSheet(payload: Record<string, unknown>) {
     }
   }
 
-  fetch(webAppUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    redirect: 'manual',
-    body: JSON.stringify({ ...payload, car: syncedCar, secret: process.env.SYNC_SECRET || 'travelnjoy-sync-2024' }),
-  }).catch((err) => {
+  try {
+    await fetch(webAppUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      redirect: 'manual',
+      body: JSON.stringify({ ...payload, car: syncedCar, secret: process.env.SYNC_SECRET || 'travelnjoy-sync-2024' }),
+    });
+  } catch (err: any) {
     console.error('Sheet sync failed:', err?.message || err);
-  });
+  }
 }
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -112,7 +115,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     // 2. Fire-and-forget sync to Sheet
     const fullCar = { ...oldCar, ...updates };
     const isStatusChangedToSold = oldCar.status !== 'sold' && updates.status === 'sold';
-    syncToSheet({
+    await syncToSheet({
       action: isStatusChangedToSold ? 'markSold' : 'upsert',
       car: fullCar,
     });
