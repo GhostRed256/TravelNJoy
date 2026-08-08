@@ -61,6 +61,7 @@ export default function AdminDashboard() {
   const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'available' | 'reserved' | 'sold' | 'deleted'>('all');
   const [showModal, setShowModal] = useState(false);
   const [editingCar, setEditingCar] = useState<Partial<Car>>(createEmptyCar());
   const [isEditing, setIsEditing] = useState(false);
@@ -358,6 +359,9 @@ export default function AdminDashboard() {
   };
 
   const filtered = cars.filter(c => {
+    if (statusFilter !== 'all' && c.status !== statusFilter) return false;
+    if (statusFilter === 'all' && c.status === 'deleted') return false;
+
     if (!search.trim()) return true;
     const q = search.toLowerCase();
     const featuresStr = (c.features || []).join(' ');
@@ -372,7 +376,7 @@ export default function AdminDashboard() {
   });
 
   const stats = {
-    total: cars.length,
+    total: cars.filter(c => c.status !== 'deleted').length,
     available: cars.filter(c => c.status === 'available').length,
     sold: cars.filter(c => c.status === 'sold').length,
     totalValue: cars.filter(c => c.status === 'available').reduce((s, c) => s + (c.quotingPrice || 0), 0),
@@ -458,7 +462,23 @@ export default function AdminDashboard() {
         </div>
 
         {/* Toolbar */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+        <div className="flex flex-col gap-4 mb-6">
+          <div className="flex flex-wrap gap-2">
+            {['all', 'available', 'reserved', 'sold', 'deleted'].map(tab => (
+              <button
+                key={tab}
+                onClick={() => setStatusFilter(tab as any)}
+                className={`px-4 py-2 rounded-xl text-sm font-medium capitalize transition-all ${
+                  statusFilter === tab 
+                    ? 'bg-purple-600 text-white shadow-lg shadow-purple-900/50' 
+                    : 'glass text-gray-400 hover:text-purple-300'
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
@@ -468,15 +488,16 @@ export default function AdminDashboard() {
                 onChange={(e) => setSearch(e.target.value)}
                 className="input-dark !pl-12 h-11"
               />
+            </div>
+            <button type="button" onClick={fetchCars} className="flex items-center gap-2 px-4 h-11 glass border border-purple-900/30 rounded-xl text-purple-300 hover:bg-purple-600/10 transition-all text-sm">
+              <RefreshCw className="w-4 h-4" />
+              Refresh
+            </button>
+            <button type="button" onClick={openNew} className="btn-primary flex items-center gap-2 px-5 h-11">
+              <Plus className="w-5 h-5" />
+              Add Car
+            </button>
           </div>
-          <button type="button" onClick={fetchCars} className="flex items-center gap-2 px-4 h-11 glass border border-purple-900/30 rounded-xl text-purple-300 hover:bg-purple-600/10 transition-all text-sm">
-            <RefreshCw className="w-4 h-4" />
-            Refresh
-          </button>
-          <button type="button" onClick={openNew} className="btn-primary flex items-center gap-2 px-5 h-11">
-            <Plus className="w-5 h-5" />
-            Add Car
-          </button>
         </div>
 
         {/* Table */}
@@ -548,32 +569,61 @@ export default function AdminDashboard() {
                     <td>
                       <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
                         car.status === 'available' ? 'status-available' :
-                        car.status === 'sold' ? 'status-sold' : 'status-reserved'
+                        car.status === 'sold' ? 'status-sold' :
+                        car.status === 'deleted' ? 'bg-red-900/40 text-red-400 border border-red-500/30' : 'status-reserved'
                       }`}>
                         {car.status}
                       </span>
                     </td>
                     <td>
                       <div className="flex items-center gap-2">
-                        <Link href={`/cars/${car.id}`} className="p-1.5 glass rounded-lg text-blue-400 hover:bg-blue-500/10 transition-all" title="View">
-                          <Eye className="w-4 h-4" />
-                        </Link>
-                        <button type="button" onClick={() => openEdit(car)} className="p-1.5 glass rounded-lg text-purple-400 hover:bg-purple-500/10 transition-all" title="Edit">
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                        {deleteConfirm === car.id ? (
-                          <div className="flex items-center gap-1">
-                            <button type="button" onClick={() => handleDelete(car.id)} className="p-1.5 bg-red-500/20 rounded-lg text-red-400 hover:bg-red-500/30 transition-all text-xs">
-                              Confirm
-                            </button>
-                            <button type="button" onClick={() => setDeleteConfirm(null)} className="p-1.5 glass rounded-lg text-gray-400">
-                              <X className="w-3 h-3" />
-                            </button>
-                          </div>
-                        ) : (
-                          <button type="button" onClick={() => setDeleteConfirm(car.id)} className="p-1.5 glass rounded-lg text-red-400 hover:bg-red-500/10 transition-all" title="Delete">
-                            <Trash2 className="w-4 h-4" />
+                        {car.status === 'deleted' ? (
+                          <button 
+                            type="button" 
+                            onClick={async () => {
+                              try {
+                                const res = await fetch(`/api/cars/${car.id}`, {
+                                  method: 'PUT',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ status: 'available' })
+                                });
+                                if (res.ok) {
+                                  fetchCars();
+                                  toast.success('Car restored!');
+                                } else {
+                                  toast.error('Failed to restore car');
+                                }
+                              } catch {
+                                toast.error('Error restoring car');
+                              }
+                            }}
+                            className="p-1.5 glass rounded-lg text-green-400 hover:bg-green-500/10 transition-all text-xs font-medium px-3"
+                          >
+                            Restore
                           </button>
+                        ) : (
+                          <>
+                            <Link href={`/cars/${car.id}`} className="p-1.5 glass rounded-lg text-blue-400 hover:bg-blue-500/10 transition-all" title="View">
+                              <Eye className="w-4 h-4" />
+                            </Link>
+                            <button type="button" onClick={() => openEdit(car)} className="p-1.5 glass rounded-lg text-purple-400 hover:bg-purple-500/10 transition-all" title="Edit">
+                              <Edit2 className="w-4 h-4" />
+                            </button>
+                            {deleteConfirm === car.id ? (
+                              <div className="flex items-center gap-1">
+                                <button type="button" onClick={() => handleDelete(car.id)} className="p-1.5 bg-red-500/20 rounded-lg text-red-400 hover:bg-red-500/30 transition-all text-xs">
+                                  Confirm
+                                </button>
+                                <button type="button" onClick={() => setDeleteConfirm(null)} className="p-1.5 glass rounded-lg text-gray-400">
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </div>
+                            ) : (
+                              <button type="button" onClick={() => setDeleteConfirm(car.id)} className="p-1.5 glass rounded-lg text-red-400 hover:bg-red-500/10 transition-all" title="Delete">
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            )}
+                          </>
                         )}
                       </div>
                     </td>

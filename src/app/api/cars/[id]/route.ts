@@ -111,6 +111,25 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     // Remove otp from updates to avoid storing it in car doc
     delete updates.otp;
 
+    const currentStatus = updates.status || oldCar.status;
+    if (currentStatus === 'available') {
+      updates.buyerName = '';
+      updates.buyerEmail = '';
+      updates.buyerAadhar = '';
+      updates.buyerPAN = '';
+      updates.buyerAddress = '';
+      updates.soldDate = '';
+      updates.docBuyerPAN = '';
+      updates.docBuyerAadhar = '';
+    } else if (currentStatus === 'reserved') {
+      updates.buyerAadhar = '';
+      updates.buyerPAN = '';
+      updates.buyerAddress = '';
+      updates.soldDate = '';
+      updates.docBuyerPAN = '';
+      updates.docBuyerAadhar = '';
+    }
+
     // 1. Write to Firestore first (source of truth)
     await carRef.update(updates);
 
@@ -146,11 +165,20 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   try {
     const { id } = await params;
 
-    // 1. Delete from Firestore (source of truth)
-    await db.collection('cars').doc(id).delete();
+    const carRef = db.collection('cars').doc(id);
+    const oldDoc = await carRef.get();
+    
+    if (!oldDoc.exists) {
+      return NextResponse.json({ error: 'Car not found' }, { status: 404 });
+    }
+    
+    const oldCar = oldDoc.data() as Car;
+
+    // 1. Soft delete in Firestore (source of truth)
+    await carRef.update({ status: 'deleted', updatedAt: new Date().toISOString() });
 
     // 2. Fire-and-forget sync to Sheet
-    await syncToSheet({ action: 'delete', carId: id });
+    await syncToSheet({ action: 'markDeleted', car: { ...oldCar, status: 'deleted' } });
 
     return NextResponse.json({ success: true });
   } catch (err: unknown) {

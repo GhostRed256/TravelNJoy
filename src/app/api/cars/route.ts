@@ -120,6 +120,26 @@ export async function POST(req: NextRequest) {
     if (!car.id) car.id = generateId();
     if (!car.createdAt) car.createdAt = new Date().toISOString();
 
+    const currentStatus = car.status || 'available';
+    if (currentStatus === 'available') {
+      car.buyerName = '';
+      car.buyerEmail = '';
+      car.buyerAadhar = '';
+      car.buyerPAN = '';
+      car.buyerAddress = '';
+      car.soldDate = '';
+      car.docBuyerPAN = '';
+      car.docBuyerAadhar = '';
+    } else if (currentStatus === 'reserved') {
+      car.buyerAadhar = '';
+      car.buyerPAN = '';
+      car.buyerAddress = '';
+      car.soldDate = '';
+      car.docBuyerPAN = '';
+      car.docBuyerAadhar = '';
+    }
+
+
     // 1. Write to Firestore (source of truth)
     await db.collection('cars').doc(car.id).set(car);
 
