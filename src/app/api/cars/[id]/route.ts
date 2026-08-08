@@ -148,7 +148,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     await db.collection('cars').doc(id).delete();
 
     // 2. Fire-and-forget sync to Sheet
-    syncToSheet({ action: 'delete', carId: id });
+    await syncToSheet({ action: 'delete', carId: id });
 
     return NextResponse.json({ success: true });
   } catch (err: unknown) {

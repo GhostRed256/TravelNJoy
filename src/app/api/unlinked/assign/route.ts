@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import type { Car } from '@/types/car';
 
-function syncToSheet(car: Car) {
+async function syncToSheet(car: Car) {
   const webAppUrl = process.env.SHEETS_WEBAPP_URL;
   if (!webAppUrl) return;
 
@@ -37,12 +37,16 @@ function syncToSheet(car: Car) {
     car: syncedCar
   };
 
-  fetch(webAppUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    redirect: 'manual',
-    body: JSON.stringify(payload),
-  }).catch((err) => console.error('Sheet sync failed:', err));
+  try {
+    await fetch(webAppUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      redirect: 'manual',
+      body: JSON.stringify(payload),
+    });
+  } catch (err: any) {
+    console.error('Sheet sync failed:', err?.message || err);
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -84,7 +88,7 @@ export async function POST(req: NextRequest) {
     const updatedCar = { ...carData, images };
     
     // Sync to Sheets
-    syncToSheet(updatedCar);
+    await syncToSheet(updatedCar);
 
     return NextResponse.json({ success: true, car: updatedCar });
   } catch (error: any) {
