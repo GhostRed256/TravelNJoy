@@ -460,9 +460,9 @@ export default function AdminDashboard() {
             { icon: Users, label: 'Sold', value: stats.sold, color: 'text-red-400' },
             { icon: DollarSign, label: 'Inventory Value', value: formatPrice(stats.totalValue), color: 'text-yellow-400' },
           ].map(({ icon: Icon, label, value, color }) => (
-            <div key={label} className="glass rounded-2xl p-5 border border-purple-900/30">
+            <div key={label} className="glass rounded-2xl p-5 border border-purple-900/30 flex flex-col justify-center">
               <Icon className={`w-5 h-5 ${color} mb-3`} />
-              <p className="text-2xl font-bold text-white font-[var(--font-outfit)]">{value}</p>
+              <p className="text-xl md:text-2xl font-bold text-white font-[var(--font-outfit)] truncate" title={String(value)}>{value}</p>
               <p className="text-xs text-gray-500 mt-1">{label}</p>
             </div>
           ))}
@@ -664,7 +664,7 @@ export default function AdminDashboard() {
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.95, y: 20 }}
             transition={{ type: "spring", duration: 0.5 }}
-            className="glass-dark rounded-2xl border border-purple-900/40 w-full max-w-3xl my-auto max-h-[92vh] flex flex-col overflow-hidden shadow-2xl pointer-events-auto"
+            className="glass-dark rounded-2xl border border-purple-900/40 w-full max-w-3xl my-auto max-h-[85dvh] sm:max-h-[92dvh] flex flex-col overflow-hidden shadow-2xl pointer-events-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between p-5 border-b border-purple-900/30 sticky top-0 bg-[#0a0a0a]/95 backdrop-blur z-10 flex-shrink-0">
@@ -1025,9 +1025,9 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="p-5 border-t border-purple-900/30 flex gap-3 justify-end sticky bottom-0 bg-[#0a0a0a]/95 backdrop-blur z-10">
-              <button type="button" onClick={handleCloseModal} className="btn-ghost px-6 py-2.5">Cancel</button>
-              <button type="button" onClick={handleSave} disabled={saving} className="btn-primary px-6 py-2.5 flex items-center gap-2 disabled:opacity-50">
+            <div className="p-4 sm:p-5 border-t border-purple-900/30 flex gap-3 justify-end sticky bottom-0 bg-[#0a0a0a]/95 backdrop-blur z-10 mt-auto">
+              <button type="button" onClick={handleCloseModal} className="btn-ghost px-5 py-2.5 sm:px-6 text-sm sm:text-base">Cancel</button>
+              <button type="button" onClick={handleSave} disabled={saving} className="btn-primary px-5 py-2.5 sm:px-6 flex items-center gap-2 disabled:opacity-50 text-sm sm:text-base">
                 {saving ? <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : null}
                 {isEditing ? 'Save Changes' : 'Add Car'}
               </button>
