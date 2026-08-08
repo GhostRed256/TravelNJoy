@@ -373,9 +373,9 @@ function carToRowData(car) {
     car.odometer || '',                                 // H=7  Odometer
     formatDateOnly(car.acquisitionDate),                // I=8  Acquisition Date
     car.rcName || '',                                   // J=9  RC Name
-    '',                                                 // K=10 Car Photos
-    '',                                                 // L=11 Doc: Vehicle Details
-    '',                                                 // M=12 Doc: RC
+    formatPhotos(car.images),                           // K=10 Car Photos
+    linkDoc(car.docVehicleDetails, 'Vehicle Details'),  // L=11 Doc: Vehicle Details
+    linkDoc(car.docRC, 'RC Doc'),                       // M=12 Doc: RC
     linkDoc(car.docInsurance, 'Insurance Doc'),         // N=13 Doc: Insurance
     linkDoc(car.docPUC, 'PUC Doc'),                     // O=14 Doc: PUC
     linkDoc(car.docNOC, 'NOC Doc'),                     // P=15 Doc: NOC
@@ -395,33 +395,36 @@ function carToRowData(car) {
 }
 
 function applyRichText(sheet, row, colIndex, urls, baseLabel) {
-  if (!urls || urls.length === 0) {
-    sheet.getRange(row, colIndex).setValue('');
-    return;
-  }
-  var richTextBuilder = SpreadsheetApp.newRichTextValue();
-  var text = '';
-  var linkPositions = [];
-  
-  for (var i = 0; i < urls.length; i++) {
-    var label = (urls.length === 1) ? baseLabel : (baseLabel + ' ' + (i + 1));
-    var start = text.length;
-    text += label;
-    var end = text.length;
-    linkPositions.push({ start: start, end: end, url: urls[i] });
-    
-    if (i < urls.length - 1) {
-      text += '\n';
+  try {
+    if (!urls || urls.length === 0) {
+      return;
     }
+    var richTextBuilder = SpreadsheetApp.newRichTextValue();
+    var text = '';
+    var linkPositions = [];
+    
+    for (var i = 0; i < urls.length; i++) {
+      var label = (urls.length === 1) ? baseLabel : (baseLabel + ' ' + (i + 1));
+      var start = text.length;
+      text += label;
+      var end = text.length;
+      linkPositions.push({ start: start, end: end, url: urls[i] });
+      
+      if (i < urls.length - 1) {
+        text += '\n';
+      }
+    }
+    
+    richTextBuilder.setText(text);
+    for (var j = 0; j < linkPositions.length; j++) {
+      var pos = linkPositions[j];
+      richTextBuilder.setLinkUrl(pos.start, pos.end, pos.url);
+    }
+    
+    sheet.getRange(row, colIndex).setRichTextValue(richTextBuilder.build());
+  } catch (e) {
+    Logger.log("applyRichText error on col " + colIndex + ": " + e.message);
   }
-  
-  richTextBuilder.setText(text);
-  for (var j = 0; j < linkPositions.length; j++) {
-    var pos = linkPositions[j];
-    richTextBuilder.setLinkUrl(pos.start, pos.end, pos.url);
-  }
-  
-  sheet.getRange(row, colIndex).setRichTextValue(richTextBuilder.build());
 }
 
 /**
