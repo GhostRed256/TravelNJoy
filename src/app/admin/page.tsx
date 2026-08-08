@@ -242,16 +242,23 @@ export default function AdminDashboard() {
   };
 
   const handleDelete = async (id: string) => {
+    // Optimistic UI update to prevent double-clicks
+    setCars(prev => prev.filter(c => c.id !== id));
+    setDeleteConfirm(null);
+    toast.info('Deleting car...');
     try {
       const res = await fetch(`/api/cars/${id}`, { method: 'DELETE' });
-      setCars(prev => prev.filter(c => c.id !== id));
-      toast.success('Car deleted!');
-      fetchCars();
+      if (res.ok) {
+        toast.success('Car deleted successfully!');
+        fetchCars(); // Fetch fresh data in the background
+      } else {
+        toast.error('Failed to delete car on server.');
+        fetchCars(); // Revert UI if it failed
+      }
     } catch {
-      setCars(prev => prev.filter(c => c.id !== id));
-      toast.success('Car deleted!');
+      toast.error('Error deleting car.');
+      fetchCars(); // Revert UI
     }
-    setDeleteConfirm(null);
   };
 
   const handleCloseModal = () => {
