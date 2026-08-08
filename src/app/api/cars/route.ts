@@ -8,8 +8,11 @@ export const revalidate = 0;
 
 // Sheet sync — must be awaited on Vercel (serverless functions terminate after response)
 async function syncToSheet(car: Car, action: 'upsert' | 'markSold' | 'delete', carId?: string) {
-  const webAppUrl = process.env.SHEETS_WEBAPP_URL || 'https://script.google.com/macros/s/AKfycbzagP2G8OpPi7mY3gLHQVGHBpMsYJE4sbG2gZWxfxJuz7E2_rC6wPzFFkj9LDBt5wFt/exec';
-  if (!webAppUrl) return;
+  const webAppUrl = process.env.SHEETS_WEBAPP_URL;
+  if (!webAppUrl) {
+    console.error('SHEETS_WEBAPP_URL is not set in environment variables');
+    return;
+  }
 
   const payload: Record<string, unknown> = {
     action,

@@ -6,9 +6,12 @@ import type { Car } from '@/types/car';
 
 async function syncToSheet(car: Car) {
   const webAppUrl = process.env.SHEETS_WEBAPP_URL;
-  if (!webAppUrl) return;
+  if (!webAppUrl) {
+    console.error('SHEETS_WEBAPP_URL is not set in environment variables');
+    return;
+  }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://travel-n-joy.vercel.app';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || '';
   const syncedCar = JSON.parse(JSON.stringify(car));
 
   if (syncedCar.images && Array.isArray(syncedCar.images)) {
