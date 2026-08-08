@@ -978,9 +978,9 @@ export default function AdminDashboard() {
                   </div>
                   <div>
                     <p className="text-base font-bold text-white">Tap ANYWHERE inside this box to add car photos</p>
-                    <p className="text-xs text-gray-300 mt-1">Supports JPG, PNG, WebP — You can select multiple photos at once!</p>
+                    <p className="text-xs text-gray-300 mt-1">Supports JPG, PNG, WebP — Upload from Camera or Files</p>
                   </div>
-                  <input type="file" accept="image/*" multiple onChange={e => handleFileUpload(e, 'images', true)} className="hidden" />
+                  <input type="file" accept="image/*" onChange={e => handleFileUpload(e, 'images', true)} className="hidden" />
                 </label>
                 {(editingCar.images || []).length > 0 && (
                   <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 mt-4">
